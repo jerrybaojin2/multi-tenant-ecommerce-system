@@ -1,0 +1,24 @@
+{"file":".trellis/spec/backend/index.md","reason":"Backend guideline entry point for cool-admin/Midway implementation context."}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"Backend module layout guidance for platform, merchant, consumer API, tenant, order, and plugin domains."}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"Database and ORM guidance for tenant_id isolation, TypeORM entities, migrations, and query constraints."}
+{"file":".trellis/spec/backend/error-handling.md","reason":"Backend error handling expectations for auth, tenant isolation, payment, fulfillment, and plugin failures."}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"Logging guidance for tenant-aware auditability and operational debugging."}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Backend quality gates and forbidden patterns for implementation."}
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend guideline entry point for uni-app and admin UI implementation context."}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"Frontend layout guidance for C-side uni-app and admin/B-side surfaces."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Component design guidance for reusable product, cart, order, and rental UI components."}
+{"file":".trellis/spec/frontend/hook-guidelines.md","reason":"Composable/hook guidance for API access, tenant context, and cross-page state."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"State guidance for tenant-scoped cart, user session, order flow, and UI state."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Type safety guidance for API contracts, order models, and rental/retail product types."}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Frontend quality gates and forbidden patterns for implementation."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer data flow guidance for product, order, tenant, payment, and plugin flows."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse guidance before creating shared tenant/order/product/plugin utilities."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/cool-admin-multi-tenant.md","reason":"Primary backend platform decision: cool-admin v8 multi-tenant behavior, constraints, and risks."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/plugin-architecture.md","reason":"Plugin lifecycle, install/uninstall, Midway mapping, and mini-program runtime constraints."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-uni-stack.md","reason":"C-side frontend stack decision: uni-app Vue3, wot-design-uni, Pinia, and tenant headers."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-framework.md","reason":"Framework comparison history and rationale for rejecting the earlier NestJS approach."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-orm-db.md","reason":"ORM/database comparison history and rationale for TypeORM/PostgreSQL direction."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md","reason":"PR-by-PR breakdown: scope, dependencies, acceptance, agent assignment — authoritative roadmap for every PR."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/fulfillment-order-fsm.md","reason":"Order model (main table + item-level type + rental subtable) and dual-layer state machine for retail+rental — core for PR3/PR5/PR7."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/payment-funds.md","reason":"WeChat service-provider split-pay + prepaid deposit + independent fund ledger — core for PR6; tenant=sub_mchid callback resolution."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-cross-platform.md","reason":"C-side MP-only scope, admin dual-brand build, 5 frontend gotchas (router glob/plugins, X-Tenant-Id, eps path, repo name) — core for C/admin PRs."}

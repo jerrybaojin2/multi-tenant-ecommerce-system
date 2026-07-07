@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+dist/
+build/
+.turbo/
+.cache/
+*.log
+tmp/
+temp/

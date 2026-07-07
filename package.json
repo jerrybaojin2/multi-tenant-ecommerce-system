@@ -1,0 +1,16 @@
+{
+  "name": "miniapp-rent-platform-pr0",
+  "version": "0.0.0-pr0",
+  "private": true,
+  "type": "module",
+  "description": "PR0 backend/infra guards for the multi-tenant rental platform.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "guard:cool-admin": "node scripts/verify-cool-admin-v8.mjs",
+    "guard:prod-config": "node scripts/check-prod-config.mjs",
+    "check": "npm run test && npm run guard:prod-config"
+  }
+}
