@@ -1,0 +1,48 @@
+import { CoolConfig } from '@cool-midway/core';
+import { MidwayConfig } from '@midwayjs/core';
+import { TenantSubscriber } from '../modules/base/db/tenant';
+
+/**
+ * 本地开发 npm run dev 读取的配置文件
+ */
+export default {
+  typeorm: {
+    dataSource: {
+      default: {
+        // PostgreSQL (PRD D3/D4). Driven by env so docker-compose / CI / local
+        // can all point at the right DB without editing source.
+        type: 'postgres',
+        host: process.env.DB_HOST || '127.0.0.1',
+        port: Number(process.env.DB_PORT || 5432),
+        username: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || 'postgres',
+        database: process.env.DB_NAME || 'cool_dev',
+        // 自动建表 注意：线上部署的时候不要使用，有可能导致数据丢失
+        synchronize: true,
+        // 打印日志
+        logging: false,
+        // 是否开启缓存
+        cache: true,
+        // 实体路径
+        entities: ['**/modules/*/entity'],
+        // 订阅者（cool-admin v8 多租户隔离核心）
+        subscribers: [TenantSubscriber],
+      },
+    },
+  },
+  cool: {
+    // 多租户隔离开启（PRD D3）。/admin/**/* 走 TenantSubscriber 自动 tenant_id 过滤
+    tenant: {
+      enable: true,
+      urls: ['/admin/**/*'],
+    },
+    // 实体与路径，跟生成代码、前端请求、swagger文档相关 注意：线上不建议开启，以免暴露敏感信息
+    eps: true,
+    // 是否自动导入模块数据库
+    initDB: true,
+    // 判断是否初始化的方式
+    initJudge: 'db',
+    // 是否自动导入模块菜单
+    initMenu: true,
+  } as CoolConfig,
+} as MidwayConfig;

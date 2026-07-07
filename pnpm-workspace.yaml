@@ -1,0 +1,8 @@
+# D10 monorepo layout (pnpm workspace).
+# Each tenant-facing app is its own package; PR0 ships backend + app-c + admin
+# scaffolds, with the cool-admin v8 integration landing under packages/backend.
+packages:
+  - "packages/*"
+  - "packages/backend"
+  - "packages/app-c"
+  - "packages/admin"

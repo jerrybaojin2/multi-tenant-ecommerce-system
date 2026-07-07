@@ -41,8 +41,8 @@ export async function verifyCoolAdminCandidate(candidatePath) {
       details.push('BaseEntity contains tenantId');
     }
 
-    if (!/\bColumn\s*\(/.test(baseEntity)) {
-      errors.push('BaseEntity tenantId file does not appear to use a TypeORM @Column decorator.');
+    if (!hasTenantIdColumn(baseEntity)) {
+      errors.push('BaseEntity tenantId does not appear to use a TypeORM @Column decorator.');
     }
   }
 
@@ -101,6 +101,10 @@ function parseVersionSpec(spec) {
   });
 }
 
+function hasTenantIdColumn(content) {
+  return /@Column\s*\([^)]*\)\s*(?:\r?\n\s*@\w+(?:\([^)]*\))?\s*)*\r?\n\s*(?:public|protected|private)?\s*(?:readonly\s+)?tenantId\b/s.test(content);
+}
+
 async function readJson(filePath, errors) {
   const text = await readText(filePath, errors);
   if (!text) {
@@ -108,7 +112,7 @@ async function readJson(filePath, errors) {
   }
 
   try {
-    return JSON.parse(text);
+    return JSON.parse(text.replace(/^\uFEFF/, ''));
   } catch (error) {
     errors.push(`Invalid JSON in ${filePath}: ${error.message}`);
     return null;
@@ -138,7 +142,12 @@ function parseArgs(argv) {
   if (candidateIndex !== -1) {
     return argv[candidateIndex + 1];
   }
-  return process.env.COOL_ADMIN_PATH;
+  const positional = argv.find(value => !value.startsWith('-'));
+  if (positional) {
+    return positional;
+  }
+  // 默认指向 vendored cool-admin v8（packages/backend）。
+  return process.env.COOL_ADMIN_PATH || 'packages/backend';
 }
 
 async function runCli() {

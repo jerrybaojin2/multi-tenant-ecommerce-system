@@ -43,6 +43,25 @@ test('cool-admin candidate guard rejects old midway and missing tenant marker', 
   assert.match(result.errors.join('\n'), /does not contain tenantId/);
 });
 
+test('cool-admin candidate guard rejects tenantId without a column decorator', async () => {
+  const root = await createCandidate({
+    midwayVersion: '^3.15.0',
+    tenantFile: true,
+    baseEntity: `
+      import { Column } from 'typeorm';
+      export class BaseEntity {
+        @Column()
+        name: string;
+        tenantId: number;
+      }
+    `
+  });
+
+  const result = await verifyCoolAdminCandidate(root);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /tenantId does not appear to use a TypeORM @Column decorator/);
+});
+
 test('production config guard requires synchronize false and eps false', () => {
   const good = checkProdConfigText(`
     export default {
@@ -61,6 +80,19 @@ test('production config guard requires synchronize false and eps false', () => {
   assert.equal(bad.ok, false);
   assert.match(bad.errors.join('\n'), /synchronize must be false/);
   assert.match(bad.errors.join('\n'), /cool\.eps must be false/);
+});
+
+test('production config guard only accepts eps under cool config', () => {
+  const result = checkProdConfigText(`
+    export default {
+      typeorm: { dataSource: { default: { synchronize: false } } },
+      other: { eps: false },
+      cool: { tenant: { enable: true } }
+    };
+  `);
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /missing cool\.eps:false production guard/);
 });
 
 async function createCandidate({ midwayVersion, tenantFile, baseEntity }) {

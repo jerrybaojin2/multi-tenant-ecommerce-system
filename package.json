@@ -1,16 +1,20 @@
 {
-  "name": "miniapp-rent-platform-pr0",
+  "name": "miniapp-rent-platform",
   "version": "0.0.0-pr0",
   "private": true,
   "type": "module",
-  "description": "PR0 backend/infra guards for the multi-tenant rental platform.",
+  "description": "Multi-tenant rental + retail SaaS platform. PR0: monorepo skeleton (D10) + cool-admin v8 gate + infra guards.",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "guard:cool-admin": "node scripts/verify-cool-admin-v8.mjs",
     "guard:prod-config": "node scripts/check-prod-config.mjs",
-    "check": "npm run test && npm run guard:prod-config"
-  }
+    "guard:docker": "node scripts/check-docker.mjs",
+    "check": "npm run guard:cool-admin && npm run test && npm run guard:prod-config",
+    "check:all": "pnpm -r run check || true && npm run check"
+  },
+  "packageManager": "pnpm@7.33.6"
 }

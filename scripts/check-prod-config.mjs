@@ -4,6 +4,9 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
 const DEFAULT_CONFIGS = [
+  // Vendored cool-admin v8 production config (canonical, PR0).
+  'packages/backend/src/config/config.prod.ts',
+  // Legacy / fallback locations kept for backward compat with earlier PR0 scaffolding.
   'backend/src/config/config.prod.ts',
   'backend/config/config.prod.ts',
   'backend/config/config.prod.example.ts'
@@ -43,7 +46,8 @@ export function checkProdConfigText(content, label = 'config') {
   const errors = [];
   const checks = [];
   const synchronizeValues = propertyValues(text, 'synchronize');
-  const epsValues = propertyValues(text, 'eps');
+  const coolConfig = propertyObjectBody(text, 'cool');
+  const epsValues = coolConfig ? propertyValues(coolConfig, 'eps') : [];
 
   if (synchronizeValues.length === 0) {
     errors.push(`${label}: missing synchronize:false production guard.`);
@@ -71,6 +75,57 @@ export function checkProdConfigText(content, label = 'config') {
 function propertyValues(text, propertyName) {
   const pattern = new RegExp(`\\b${propertyName}\\s*:\\s*(true|false)\\b`, 'g');
   return [...text.matchAll(pattern)].map(match => match[1]);
+}
+
+function propertyObjectBody(text, propertyName) {
+  const pattern = new RegExp(`\\b${propertyName}\\s*:\\s*\\{`, 'g');
+  const match = pattern.exec(text);
+  if (!match) {
+    return null;
+  }
+
+  const openIndex = match.index + match[0].lastIndexOf('{');
+  return braceBody(text, openIndex);
+}
+
+function braceBody(text, openIndex) {
+  let depth = 0;
+  let quote = null;
+  let escaped = false;
+
+  for (let index = openIndex; index < text.length; index += 1) {
+    const char = text[index];
+
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'" || char === '`') {
+      quote = char;
+      continue;
+    }
+
+    if (char === '{') {
+      depth += 1;
+      continue;
+    }
+
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        return text.slice(openIndex + 1, index);
+      }
+    }
+  }
+
+  return null;
 }
 
 function stripComments(content) {

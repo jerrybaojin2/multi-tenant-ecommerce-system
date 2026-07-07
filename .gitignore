@@ -10,3 +10,6 @@ build/
 *.log
 tmp/
 temp/
+.vendor/
+.pnpm-store/
+packages/backend/data/

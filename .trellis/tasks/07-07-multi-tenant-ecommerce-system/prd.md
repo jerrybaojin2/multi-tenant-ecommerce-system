@@ -20,7 +20,19 @@
 
 **D7 — 前端端范围**：**C 端 MVP 仅微信小程序**（H5 二期、App 暂不进，不为多端提前抽象）；admin 双品牌（商家后台 + 平台运营后台）。
 
-**D8 — 支付方案**：**微信服务商分账（收付通降级）**。平台暂无收付通所需 ICP/EDI 资质，降级到普通服务商分账；仍是微信分账、合规；API 与收付通一致，未来取得资质后迁移成本低。押金走预付费托管；封装为 cool-admin 插件；回调从 sub_mchid 反查 tenant。
+**D8 — 支付方案（境内 + 境外多通道）**：按**实际可生产规则**双轨接入。
+- **境内**：微信（服务商分账，每商家=sub_mchid，消除二清）+ 支付宝（分账）
+- **境外**：连连支付 LianLian / PingPong（跨境收单 或 收款/结汇，视场景）
+- **统一抽象**：支付通道 Strategy/适配器，订单按业务或用户区域路由；通道配置按租户(商家)管理
+- **押金托管**：强制境内路由——境外通道无原生冻结能力，businessType=DEPOSIT 时路由层拒绝境外通道（押金走微信预付费/支付宝预授权）
+- 封装为 cool-admin 插件 `plugin-payment`；回调按通道商户标识反查 tenant
+- **research 结论**（payment-cross-border.md）：PaymentChannel Strategy 统一接口；MerchantChannelConfig 按租户行级配置
+- ⚠️ **支付宝 MVP 限制**：支付宝无法在微信小程序内拉起 → MVP C 端仅微信支付；支付宝通道先做接口+沙箱，PC/H5/支付宝小程序端上线时启用
+- **境外场景 = 跨境收款/结汇（场景 B，已确认）**：商家做跨境电商，境外销售款经连连/PingPong 收款结汇到商家账户
+
+**D9 — C 端用户身份**：**每租户独立 + 预留全局**。每个商家小程序有独立 tenant_user（带 tenant_id）；表预留 union_id 字段，未来可升级为跨商家全局用户统一（积分/售后/风控）。MVP 不做跨商家识别。
+
+**D10 — 仓库结构**：**单仓 monorepo（pnpm workspace）**。根目录 `packages/{backend, app-c, admin}`：backend=cool-admin v8、app-c=uni-app Vue3 C 端、admin=cool-admin-vue 8.x（B+平台双品牌）。统一依赖/CI/脚本/版本。
 
 ## Technical Approach
 
@@ -28,7 +40,7 @@
   - 多租户：`BaseEntity.tenantId` + JWT tenantId 声明 + TypeORM Subscriber（afterSelect/Insert/Update/Delete）；admin 超管 + 白名单 URL 绕过 = 平台运营特权
   - 三端（单服务）：`controller/admin/**`（B 商家 + 平台运营，角色+tenantId 区分）+ `controller/app/consumer/**`（C 端，独立 /app token 流）
   - 插件：cool-admin 平台级插件；插件表须继承 BaseEntity 才有 tenant_id
-- **支付**：**微信服务商分账（D8）**；封装为 cool-admin 插件；每商家=sub_mchid；回调从 sub_mchid 反查 tenant；押金预付费托管
+- **支付（多通道 D8）**：境内 微信服务商分账 + 支付宝；境外 连连/PingPong；Strategy 统一抽象、按区域/业务路由；封装 cool-admin 插件；押金多通道兼容
 - **C 端**：uni-app Vue3 + Vite + TS + wot-design-uni + Pinia；每商家独立小程序 AppID + `VITE_TENANT_ID` + 请求头 `X-Tenant-Id`；购物车 `Record<tenantId, CartItem[]>` 分桶；租/买双入口 Tab
 - **Admin**：cool-admin-vue（Vue 3.5，**注意仓库是 cool-admin-vue 非 cool-admin-vue3**）；`vite build --mode platform|merchant` + `VITE_BRAND` 双品牌；菜单/权限后端驱动
 
@@ -51,7 +63,8 @@
 ## Research 已完成
 
 - [`research/cool-admin-multi-tenant.md`](research/cool-admin-multi-tenant.md) — ✅ GO：v8 内置多租户、TypeORM、PG 可选 RLS、三端组织、三大坑
-- [`research/payment-funds.md`](research/payment-funds.md) — 支付推荐收付通+预付费押金；备选服务商分账；二清合规；回调反查 tenant
+- [`research/payment-funds.md`](research/payment-funds.md) — 境内微信：服务商分账+预付费押金；二清合规；回调反查 tenant
+- [`research/payment-cross-border.md`](research/payment-cross-border.md) — ✅ 多通道 Strategy 抽象；境内支付宝(分账+预授权，但微信小程序无法拉起→MVP仅微信)；境外默认收款/结汇(连连/PingPong)；押金强制境内路由；合规 blocker（接口字段/费率待落地核实）
 - [`research/fulfillment-order-fsm.md`](research/fulfillment-order-fsm.md) — 订单主表+行级类型+租赁子表；双层状态机；资金独立台账
 - [`research/mvp-pr-breakdown.md`](research/mvp-pr-breakdown.md) — 10 个 PR 序列 + agent 映射 + 并行波次
 - [`research/frontend-cross-platform.md`](research/frontend-cross-platform.md) — C 端仅 MP；admin 双品牌；5 个前端坑；仓库名更正
@@ -62,8 +75,11 @@
 ## Open Questions
 
 - 待 PR0/PR1 核实：cool-admin v8 内置 EventBus？（资金联动 DepositService 依赖；否则用 Midway 自带事件兜底）
+- ⚠️ **合规 P0 blocker**：平台 ICP/EDI 资质（微信走收付通 vs 降级分账）+ 微信/支付宝服务商进件；**P1**：跨境收款开户 + 企业对公结汇 + 数据出境合规
 
-> ✅ blocking 已全部收敛（D1–D8 + MVP 范围 + PR 拆解）。
+> ✅ 全部业务决策已收敛（D1–D10 + MVP + PR + 默认值 + 多通道境外场景 B + PG=Docker + v8=vendor 接入）。合规资质（P0/P1）属业务方落实。
+> PR0 落地（vendor 完成）：cool-admin v8（8.x 分支）已 vendor 到 packages/backend（嵌套 .git 已移除）；MySQL→PostgreSQL（pg 驱动，DB_* env）；docker-compose.yml（postgres:16 + cool_dev/cool_test）；真实多租户隔离测试 tests/real-tenant.test.mjs（真实 TypeORM + v8 TenantSubscriber 钩子 + PG，PG 不可用时优雅 skip + 防漂移校验）；`npm run check` 全绿。
+> ⚠️ PR0 阻断：本机无 Docker / 无 PG → 真实隔离测试 skip（非 fail）、cool-admin v8 app 启动未实跑。需在有 Docker 的环境跑 `docker compose up -d` 后复测真实测试 + `npm run dev`。
 
 ## MVP PR 序列（来自 research/mvp-pr-breakdown.md）
 
@@ -91,6 +107,7 @@
 - 租售结合（订单主表+行级类型+租赁子表）
 - 插件系统复用 cool-admin
 - **MVP = 租售并行完整**，C 端仅微信小程序
+- 消息通知：MVP 用微信小程序订阅消息（支付成功 / 发货 / 租赁到期）
 
 ## Acceptance Criteria (evolving)
 
@@ -114,7 +131,9 @@
 
 - H5 / App 端（二期）
 - 第三方聚合支付
-- 复杂营销（拼团/分销）——按需后置
+- 营销（优惠券/拼团/分销）——按需后置
+- 租赁损坏赔偿独立理赔工单（MVP 简化为：逾期/损坏 → 从押金扣款）
+- 跨商家全局用户识别（D9 预留字段，MVP 不实现）
 - PostgreSQL RLS（可选加固，非 MVP 必须）
 
 ## Technical Notes
