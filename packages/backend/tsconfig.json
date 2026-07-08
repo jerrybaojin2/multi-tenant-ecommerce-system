@@ -1,30 +1,21 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2021",
     "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "inlineSourceMap": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": false,
-    "stripInternal": true,
+    "strict": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "pretty": true,
     "declaration": false,
-    "noImplicitAny": false,
-    "typeRoots": [
-      "typings",
-      "./node_modules/@types",
-    ],
+    "typeRoots": ["typings", "./node_modules/@types"],
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "src"
   },
-  "exclude": [
-    "dist",
-    "node_modules",
-    "test",
-  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "test"]
 }

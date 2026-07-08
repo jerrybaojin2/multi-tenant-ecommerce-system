@@ -1,19 +1,29 @@
 {
-  "controller": {
+  "midway controller": {
     "prefix": "controller",
     "body": [
-      "import { CoolController, BaseController } from '@cool-midway/core';",
+      "import { Body, Controller, Get, Inject, Post } from '@midwayjs/core';",
+      "import { ${1:XxxService} } from '../service/${2:xxx}';",
       "",
       "/**",
-      " * 描述",
+      " * ${3:功能描述}",
       " */",
-      "@CoolController({",
-      "  api: ['add', 'delete', 'update', 'info', 'list', 'page'],",
-      "  entity: 实体,",
-      "})",
-      "export class XxxController extends BaseController {}",
-      ""
+      "@Controller('/${4:admin}/${5:xxx}')",
+      "export class ${6:XxxController} {",
+      "  @Inject()",
+      "  ${7:xxxService}: ${1:XxxService};",
+      "",
+      "  @Get('/info')",
+      "  async info() {",
+      "    return this.${7:xxxService}.info();",
+      "  }",
+      "",
+      "  @Post('/save')",
+      "  async save(@Body() body: ${8:any}) {",
+      "    return this.${7:xxxService}.save(body);",
+      "  }",
+      "}"
     ],
-    "description": "cool-admin controller代码片段"
+    "description": "Midway controller 代码片段"
   }
 }

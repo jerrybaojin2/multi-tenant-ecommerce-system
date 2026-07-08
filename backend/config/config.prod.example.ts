@@ -10,15 +10,27 @@ export default {
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
-        synchronize: false
+        synchronize: false,
+        logging: false,
+        entities: ['**/dist/**/*.entity.js', '**/dist/**/entity/*.js']
       }
     }
   },
-  cool: {
-    eps: false,
-    tenant: {
-      enable: true,
-      urls: ['/admin/**/*']
+  tenant: {
+    context: {
+      headerName: 'x-tenant-id',
+      required: true
+    },
+    rls: {
+      enabled: true,
+      settingKey: 'app.tenant_id'
     }
+  },
+  appMeta: {
+    exposeDevMetadata: false
+  },
+  prodGuard: {
+    requireSecureSecrets: true,
+    rejectDevMetadata: true
   }
 } as MidwayConfig;

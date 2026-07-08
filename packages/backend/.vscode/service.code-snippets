@@ -1,33 +1,18 @@
 {
-  "service": {
+  "midway service": {
     "prefix": "service",
     "body": [
-      "import { Init, Provide } from '@midwayjs/core';",
-      "import { BaseService } from '@cool-midway/core';",
-      "import { InjectEntityModel } from '@midwayjs/typeorm';",
-      "import { Repository } from 'typeorm';",
+      "import { Provide } from '@midwayjs/core';",
+      "import { requireTenantId } from '../../../core/tenant/tenant-context';",
       "",
-      "/**",
-      " * 描述",
-      " */",
       "@Provide()",
-      "export class XxxService extends BaseService {",
-      "  @InjectEntityModel(实体)",
-      "  xxxEntity: Repository<实体>;",
-      ""
-      "  @Init()"
-      "  async init() {",
-      "    await super.init();",
-      "    this.setEntity(this.xxxEntity);",
+      "export class ${1:XxxService} {",
+      "  async ${2:execute}() {",
+      "    const tenantId = requireTenantId();",
+      "    return { tenantId };",
       "  }",
-      "",
-      "  /**",
-      "   * 描述",
-      "   */",
-      "  async xxx() {}",
-      "}",
-      ""
+      "}"
     ],
-    "description": "cool-admin service代码片段"
+    "description": "Tenant-aware Midway service snippet"
   }
 }

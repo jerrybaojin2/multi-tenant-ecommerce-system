@@ -6,7 +6,7 @@
 
 ## Overview
 
-Use cool-admin/Midway error handling and return client-safe messages. Domain services should reject invalid state transitions early, preserve idempotency, and avoid leaking internal provider details to clients.
+Use Midway error filters and return client-safe messages. Domain services should reject invalid state transitions early, preserve idempotency, and avoid leaking internal provider details to clients.
 
 Errors should answer three questions:
 
@@ -20,12 +20,12 @@ Errors should answer three questions:
 
 - **Validation errors**: Invalid DTO shape, missing required fields, invalid enum/status values. Return 400-style responses through the framework validation path.
 - **Authentication errors**: Missing or invalid admin/app token. Return unauthorized without revealing whether a tenant/resource exists.
-- **Authorization errors**: Role/menu/plugin not enabled, merchant accessing platform-only capability, cross-tenant access attempt. Return forbidden.
+- **Authorization errors**: Role/menu/feature not enabled, merchant accessing platform-only capability, cross-tenant access attempt. Return forbidden.
 - **Domain conflict errors**: Invalid order/rental transition, duplicate callback, stale status, inventory conflict. Return a business error and keep state unchanged.
-- **Provider errors**: WeChat payment/profit-sharing/deposit API failures. Store provider code/message internally; expose a stable business message.
-- **System errors**: Database, Redis, queue, unexpected exceptions. Let the framework exception filter produce a generic response and log the full details.
+- **Provider errors**: WeChat/Alipay/LianLian/PingPong API failures. Store provider code/message internally; expose a stable business message.
+- **System errors**: Database, Redis, queue, unexpected exceptions. Let the Midway exception filter produce a generic response and log the full details.
 
-Use the cool-admin standard business exception class/helper where available in the v8 codebase. Do not invent multiple parallel error wrappers.
+Use one project-standard `BusinessError` shape once the backend skeleton is in place. Do not invent multiple parallel error wrappers.
 
 ---
 
@@ -41,28 +41,26 @@ Use the cool-admin standard business exception class/helper where available in t
 Example service pattern:
 
 ```ts
-async returnRental(rentalId: number, command: ReturnRentalDto) {
-  return this.rentalRepo.manager.transaction(async manager => {
-    const rental = await this.loadTenantRentalForUpdate(manager, rentalId);
+async returnRental(rentalId: string, command: ReturnRentalDto) {
+  return this.database.transaction(async tx => {
+    const rental = await this.rentalRepo.loadForUpdate(tx, rentalId);
     if (!canReturn(rental.status)) {
-      throw new BusinessError('Rental cannot be returned from current status');
+      throw new BusinessError('RENTAL_STATUS_INVALID', 'Rental cannot be returned from current status');
     }
     // update rental, append rental_event, emit deposit settlement event
   });
 }
 ```
 
-Replace `BusinessError` with the project-standard cool-admin exception once the backend skeleton is bootstrapped.
-
 ---
 
 ## API Error Responses
 
-Follow cool-admin's response envelope and status conventions once the skeleton is present. Until then, all backend APIs must preserve these response principles:
+All backend APIs must preserve these response principles:
 
 - Do not expose stack traces, SQL text, certificates, provider secrets, or raw upstream payloads.
 - Include a stable business message suitable for the current client.
-- Use consistent codes for common domain failures such as `ORDER_STATUS_INVALID`, `TENANT_FORBIDDEN`, `PLUGIN_DISABLED`, `PAYMENT_CALLBACK_DUPLICATE`.
+- Use consistent codes for common domain failures such as `ORDER_STATUS_INVALID`, `TENANT_FORBIDDEN`, `FEATURE_DISABLED`, `PAYMENT_CALLBACK_DUPLICATE`.
 - Use provider request ids or transaction ids in logs, not necessarily in client responses.
 
 ---
@@ -71,14 +69,14 @@ Follow cool-admin's response envelope and status conventions once the skeleton i
 
 - Cross-tenant access attempts are security events, not normal not-found debugging.
 - For merchant/admin callers, prefer forbidden/not-found responses that do not confirm another tenant's record exists.
-- Platform-only `noTenant` paths must fail closed when role checks are missing or ambiguous.
-- Plugin-disabled access returns forbidden and should identify the plugin key in logs.
+- Platform-only paths must fail closed when role checks are missing or ambiguous.
+- Feature-disabled access returns forbidden and should identify the feature key in logs.
 
 ---
 
 ## Common Mistakes
 
-- Returning raw WeChat error payloads to C-end clients.
+- Returning raw provider error payloads to C-end clients.
 - Treating duplicate payment callbacks as fatal instead of idempotent success.
 - Catching transaction errors and continuing after partial writes.
 - Logging secrets while debugging payment certificate or signature failures.

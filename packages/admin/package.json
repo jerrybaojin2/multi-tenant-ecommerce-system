@@ -2,8 +2,8 @@
   "name": "@miniapp-rent/admin",
   "version": "0.0.0-pr0",
   "private": true,
-  "description": "cool-admin-vue 8.x (Vue 3.5 + Vite + Pinia) dual-brand admin (merchant + platform). PR0: placeholder; scaffold lands next PR.",
+  "description": "Dual-brand admin placeholder for merchant and platform consoles. PR1 decides Next.js or Vue and lands the scaffold.",
   "scripts": {
-    "check": "echo 'admin: scaffold pending (cool-admin-vue 8.x dual-brand), tracked in PR1'"
+    "check": "echo 'admin: scaffold pending; PR1 decides Next.js or Vue'"
   }
 }

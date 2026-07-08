@@ -1,20 +1,16 @@
 {
-  "entity": {
+  "tenant entity": {
     "prefix": "entity",
     "body": [
-      "import { BaseEntity } from '../../base/entity/base';",
       "import { Column, Entity } from 'typeorm';",
+      "import { BaseTenantEntity } from '../../../core/database/base-tenant.entity';",
       "",
-      "/**",
-      " * 描述",
-      " */",
-      "@Entity('xxx_xxx_xxx')",
-      "export class XxxEntity extends BaseEntity {",
-      "  @Column({ comment: '描述' })",
-      "  xxx: string;",
-      "}",
-      ""
+      "@Entity('${1:module_table}')",
+      "export class ${2:XxxEntity} extends BaseTenantEntity {",
+      "  @Column({ name: '${3:name}', type: 'varchar', length: ${4:128} })",
+      "  ${5:name}: string;",
+      "}"
     ],
-    "description": "cool-admin entity代码片段"
+    "description": "Tenant-scoped TypeORM entity snippet"
   }
 }

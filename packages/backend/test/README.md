@@ -1,12 +1,25 @@
-# 测试方式 
+# Backend Tests
 
-考虑到cool-admin采用了自动化路由技术，它与官方集成的jest测试工具并不兼容。为确保测试环境与实际的开发环境保持一致，我们并不推荐使用jest进行测试。
+Backend package tests should verify the project-owned Midway.js service, tenant
+context, tenant-aware data access, and production guardrails.
 
-# 自动化测试API工具
+Current PR0 test layers:
 
-我们为您推荐以下的自动化API测试工具：
+- Root `tests/tenant-isolation.test.mjs` keeps tenant isolation semantics covered
+  without external services.
+- Root `tests/real-tenant.test.mjs` runs TypeORM query guard checks against
+  PostgreSQL when `rent_test` is available.
 
-- [Apifox](https://apifox.com/)
-- [ApiPost](https://www.apipost.cn/)
+Run from the repository root:
 
-同时这些工具也方便写API接口文档，更加灵活有用
+```bash
+npm run check
+```
+
+Run backend package checks from this directory:
+
+```bash
+npm run build
+npm run lint
+npm run check
+```

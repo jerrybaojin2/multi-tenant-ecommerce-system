@@ -1,21 +1,16 @@
 {
-  "queue": {
+  "tenant job handler": {
     "prefix": "queue",
     "body": [
-      "import { BaseCoolQueue, CoolQueue } from '@cool-midway/task';",
+      "import { Provide } from '@midwayjs/core';",
       "",
-      "/**",
-      " * 队列",
-      " */",
-      "@CoolQueue()",
-      "export abstract class xxxQueue extends BaseCoolQueue {",
-      "  async data(job: any, done: any) {",
-      "    console.log('收到的数据', job.data);",
-      "    done();",
+      "@Provide()",
+      "export class ${1:XxxJobHandler} {",
+      "  async execute(input: { tenantId: string; ${2:id}: string }) {",
+      "    // Jobs must establish tenant context before touching tenant data.",
       "  }",
-      "}",
-      ""
+      "}"
     ],
-    "description": "cool-admin service代码片段"
+    "description": "Tenant-aware background job handler snippet"
   }
 }

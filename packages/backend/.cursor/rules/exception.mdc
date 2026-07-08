@@ -1,22 +1,25 @@
 ---
-description: 异常处理(Exception)
-globs: 
+description: 异常(Exception)
+globs:
 ---
-# 异常处理
+# 异常
 
-框架自带有： `CoolCommException`
+异常由项目自研错误模型统一处理。业务代码抛出明确的业务异常，统一异常过滤器负责转换为 HTTP 响应、日志和审计事件。
 
-## 通用异常
-
-CoolCommException
-
-返回码： 1001
-
-返回消息：comm fail
-
-用法：
+## 写法
 
 ```ts
-// 可以自定义返回消息
-throw new CoolCommException('用户不存在~');
+import { BusinessError } from '../../../core/error/business_error';
+
+if (!user) {
+  throw new BusinessError('USER_NOT_FOUND', '用户不存在');
+}
 ```
+
+## 规则
+
+- 错误码使用稳定英文常量，错误消息使用中文。
+- Service 抛业务异常，Controller 不拼接错误响应。
+- 不把数据库错误、堆栈、SQL、密钥或内部路径暴露给客户端。
+- 租户、权限、生产环境保护相关异常必须记录审计上下文。
+- 生产环境只返回必要错误信息，详细原因写入服务端日志。

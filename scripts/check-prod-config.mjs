@@ -4,9 +4,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
 const DEFAULT_CONFIGS = [
-  // Vendored cool-admin v8 production config (canonical, PR0).
   'packages/backend/src/config/config.prod.ts',
-  // Legacy / fallback locations kept for backward compat with earlier PR0 scaffolding.
   'backend/src/config/config.prod.ts',
   'backend/config/config.prod.ts',
   'backend/config/config.prod.example.ts'
@@ -46,8 +44,10 @@ export function checkProdConfigText(content, label = 'config') {
   const errors = [];
   const checks = [];
   const synchronizeValues = propertyValues(text, 'synchronize');
-  const coolConfig = propertyObjectBody(text, 'cool');
-  const epsValues = coolConfig ? propertyValues(coolConfig, 'eps') : [];
+  const appMetaConfig = propertyObjectBody(text, 'appMeta');
+  const exposeDevMetadataValues = appMetaConfig
+    ? propertyValues(appMetaConfig, 'exposeDevMetadata')
+    : [];
 
   if (synchronizeValues.length === 0) {
     errors.push(`${label}: missing synchronize:false production guard.`);
@@ -57,12 +57,12 @@ export function checkProdConfigText(content, label = 'config') {
     checks.push(`${label}: synchronize:false`);
   }
 
-  if (epsValues.length === 0) {
-    errors.push(`${label}: missing cool.eps:false production guard.`);
-  } else if (epsValues.some(value => value !== 'false')) {
-    errors.push(`${label}: cool.eps must be false in production.`);
+  if (exposeDevMetadataValues.length === 0) {
+    errors.push(`${label}: missing appMeta.exposeDevMetadata:false production guard.`);
+  } else if (exposeDevMetadataValues.some(value => value !== 'false')) {
+    errors.push(`${label}: appMeta.exposeDevMetadata must be false in production.`);
   } else {
-    checks.push(`${label}: cool.eps:false`);
+    checks.push(`${label}: appMeta.exposeDevMetadata:false`);
   }
 
   return {

@@ -1,17 +1,19 @@
 # @miniapp-rent/admin
 
-Dual-brand admin (merchant backend + platform ops console). Stack (per
-`.trellis/spec/frontend/`):
+Dual-brand admin placeholder for the merchant console and platform operations
+console.
 
-- `cool-admin-vue` 8.x (repo is `cool-admin-vue`, NOT `cool-admin-vue3`)
-  Vue 3.5 + Vite + Pinia + vue-router
-- `vite build --mode merchant` / `vite build --mode platform` driven by
-  `VITE_BRAND`
-- Menus / permissions / routes are backend-driven via `permmenu`
-- Must extend the router `import.meta.glob` to cover `plugins/*` (upstream only
-  globs `modules/*`); add `X-Tenant-Id` to the request interceptor
+## Stack Decision
 
-## PR0 status
+The admin stack is not finalized yet. PR1 will choose either:
 
-Placeholder only. The cool-admin-vue 8.x scaffold and dual-brand build config
-land in the walking-skeleton PR.
+- Next.js
+- Vue
+
+After that decision, this package should receive the actual scaffold, routing
+shell, auth shell, API client setup, and build commands for the selected stack.
+
+## Current Status
+
+Placeholder only. Keep this package lightweight until PR1 records the stack
+decision and replaces these notes with implementation-specific documentation.

@@ -4,7 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { checkProdConfigText } from '../scripts/check-prod-config.mjs';
-import { isVersionAtLeast, verifyCoolAdminCandidate } from '../scripts/verify-cool-admin-v8.mjs';
+import {
+  isVersionAtLeast,
+  verifyBackendArchitecture,
+} from '../scripts/verify-backend-architecture.mjs';
 
 test('midway version guard accepts v3 and v4 ranges', () => {
   assert.equal(isVersionAtLeast('^3.0.0', [3, 0, 0]), true);
@@ -12,61 +15,49 @@ test('midway version guard accepts v3 and v4 ranges', () => {
   assert.equal(isVersionAtLeast('^2.14.0', [3, 0, 0]), false);
 });
 
-test('cool-admin candidate guard accepts required v8 integration markers', async () => {
-  const root = await createCandidate({
-    midwayVersion: '^3.15.0',
-    tenantFile: true,
-    baseEntity: `
-      import { Column } from 'typeorm';
-      export class BaseEntity {
-        @Column({ nullable: true })
-        tenantId: number;
-      }
-    `
+test('backend architecture guard accepts self-built Midway backend markers', async () => {
+  const root = await createBackendCandidate({
+    midwayVersion: '^3.20.3',
+    dependencies: {},
+    tenantContext: 'import { AsyncLocalStorage } from "node:async_hooks"; export const s = new AsyncLocalStorage();',
+    configuration: 'import { Configuration } from "@midwayjs/core"; export class MainConfiguration {}',
   });
 
-  const result = await verifyCoolAdminCandidate(root);
+  const result = await verifyBackendArchitecture(root);
   assert.equal(result.ok, true, result.errors.join('\n'));
 });
 
-test('cool-admin candidate guard rejects old midway and missing tenant marker', async () => {
-  const root = await createCandidate({
-    midwayVersion: '^2.14.0',
-    tenantFile: false,
-    baseEntity: 'export class BaseEntity {}'
+test('backend architecture guard rejects cool-admin runtime dependency', async () => {
+  const root = await createBackendCandidate({
+    midwayVersion: '^3.20.3',
+    dependencies: { '@cool-midway/core': '^8.0.7' },
+    tenantContext: 'import { AsyncLocalStorage } from "node:async_hooks"; export const s = new AsyncLocalStorage();',
+    configuration: 'export class MainConfiguration {}',
   });
 
-  const result = await verifyCoolAdminCandidate(root);
+  const result = await verifyBackendArchitecture(root);
   assert.equal(result.ok, false);
-  assert.match(result.errors.join('\n'), /@midwayjs\/core must be >=3\.0\.0/);
-  assert.match(result.errors.join('\n'), /Missing src\/modules\/base\/db\/tenant\.ts/);
-  assert.match(result.errors.join('\n'), /does not contain tenantId/);
+  assert.match(result.errors.join('\n'), /must not depend on cool-admin runtime packages/);
 });
 
-test('cool-admin candidate guard rejects tenantId without a column decorator', async () => {
-  const root = await createCandidate({
-    midwayVersion: '^3.15.0',
-    tenantFile: true,
-    baseEntity: `
-      import { Column } from 'typeorm';
-      export class BaseEntity {
-        @Column()
-        name: string;
-        tenantId: number;
-      }
-    `
+test('backend architecture guard rejects missing tenant context', async () => {
+  const root = await createBackendCandidate({
+    midwayVersion: '^3.20.3',
+    dependencies: {},
+    tenantContext: 'export const tenant = {};',
+    configuration: 'export class MainConfiguration {}',
   });
 
-  const result = await verifyCoolAdminCandidate(root);
+  const result = await verifyBackendArchitecture(root);
   assert.equal(result.ok, false);
-  assert.match(result.errors.join('\n'), /tenantId does not appear to use a TypeORM @Column decorator/);
+  assert.match(result.errors.join('\n'), /must use AsyncLocalStorage/);
 });
 
-test('production config guard requires synchronize false and eps false', () => {
+test('production config guard requires synchronize false and dev metadata false', () => {
   const good = checkProdConfigText(`
     export default {
       typeorm: { dataSource: { default: { synchronize: false } } },
-      cool: { eps: false }
+      appMeta: { exposeDevMetadata: false }
     };
   `);
   assert.equal(good.ok, true, good.errors.join('\n'));
@@ -74,42 +65,56 @@ test('production config guard requires synchronize false and eps false', () => {
   const bad = checkProdConfigText(`
     export default {
       typeorm: { dataSource: { default: { synchronize: true } } },
-      cool: { eps: true }
+      appMeta: { exposeDevMetadata: true }
     };
   `);
   assert.equal(bad.ok, false);
   assert.match(bad.errors.join('\n'), /synchronize must be false/);
-  assert.match(bad.errors.join('\n'), /cool\.eps must be false/);
+  assert.match(bad.errors.join('\n'), /appMeta\.exposeDevMetadata must be false/);
 });
 
-test('production config guard only accepts eps under cool config', () => {
+test('production config guard only accepts dev metadata flag under appMeta', () => {
   const result = checkProdConfigText(`
     export default {
       typeorm: { dataSource: { default: { synchronize: false } } },
-      other: { eps: false },
-      cool: { tenant: { enable: true } }
+      other: { exposeDevMetadata: false },
+      appMeta: {}
     };
   `);
 
   assert.equal(result.ok, false);
-  assert.match(result.errors.join('\n'), /missing cool\.eps:false production guard/);
+  assert.match(result.errors.join('\n'), /missing appMeta\.exposeDevMetadata:false production guard/);
 });
 
-async function createCandidate({ midwayVersion, tenantFile, baseEntity }) {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'cool-admin-candidate-'));
+async function createBackendCandidate({
+  midwayVersion,
+  dependencies,
+  tenantContext,
+  configuration,
+}) {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'midway-backend-candidate-'));
   await writeFile(
     path.join(root, 'package.json'),
-    JSON.stringify({ dependencies: { '@midwayjs/core': midwayVersion } }, null, 2)
+    JSON.stringify(
+      {
+        dependencies: {
+          '@midwayjs/core': midwayVersion,
+          ...dependencies,
+        },
+      },
+      null,
+      2
+    )
   );
 
-  const tenantDir = path.join(root, 'src', 'modules', 'base', 'db');
-  const entityDir = path.join(root, 'src', 'modules', 'base', 'entity');
-  await mkdir(tenantDir, { recursive: true });
-  await mkdir(entityDir, { recursive: true });
+  await mkdir(path.join(root, 'src', 'core', 'tenant'), { recursive: true });
+  await mkdir(path.join(root, 'src', 'core', 'database'), { recursive: true });
+  await mkdir(path.join(root, 'src', 'config'), { recursive: true });
 
-  if (tenantFile) {
-    await writeFile(path.join(tenantDir, 'tenant.ts'), 'export class TenantSubscriber {}\n');
-  }
-  await writeFile(path.join(entityDir, 'base.ts'), baseEntity);
+  await writeFile(path.join(root, 'src', 'configuration.ts'), configuration);
+  await writeFile(path.join(root, 'src', 'core', 'tenant', 'tenant-context.ts'), tenantContext);
+  await writeFile(path.join(root, 'src', 'core', 'tenant', 'tenant.middleware.ts'), 'export class TenantMiddleware {}\n');
+  await writeFile(path.join(root, 'src', 'core', 'database', 'tenant.subscriber.ts'), 'export class TenantSubscriber {}\n');
+  await writeFile(path.join(root, 'src', 'config', 'config.prod.ts'), 'export default {};\n');
   return root;
 }

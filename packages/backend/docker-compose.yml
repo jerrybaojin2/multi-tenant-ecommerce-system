@@ -1,16 +1,7 @@
-# PostgreSQL 本地/CI 数据库环境（PRD D3/D4：共享库 + tenant_id 逻辑隔离）
-#
-# 用法（需要本机已安装 Docker）：
-#   docker compose up -d            # 启动 PG（cool_dev 开发库 + cool_test 测试库）
-#   docker compose down             # 停止
-#   docker compose down -v          # 停止并删除数据卷
-#
-# 数据持久化在当前目录下的 data/postgresql/。
-# 端口默认 5432；如冲突，调整下方 ports 中冒号前的端口号，并同步改 .env 的 DB_PORT。
 version: "3.1"
 
 services:
-  coolPG:
+  rentPG:
     image: postgres:16-alpine
     restart: always
     volumes:
@@ -20,13 +11,12 @@ services:
       TZ: Asia/Shanghai
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      # POSTGRES_DB 只创建主库；额外的测试库由 init-db.sql 在首启时创建
-      POSTGRES_DB: cool_dev
+      POSTGRES_DB: rent_dev
     networks:
-      - cool
+      - rent
     ports:
       - 5432:5432
 
 networks:
-  cool:
+  rent:
     driver: bridge
