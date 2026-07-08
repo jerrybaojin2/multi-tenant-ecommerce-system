@@ -115,6 +115,17 @@ packages/backend/
 
 ---
 
+## Middleware Registration
+
+- Middleware classes under `core/**` are not active just because they use `@Middleware()`.
+- Global request middleware must be registered in `src/configuration.ts` with the class `getName()` value, for example `this.app.useMiddleware(['tenant'])`.
+- Registered middleware classes must also be Midway definitions, so use `@Provide('<middleware-name>')` with the same value returned by `getName()`.
+- In the compiled bootstrap path, provider/controller/middleware files must be exported from `src/index.ts` so decorators execute and definitions enter the container.
+- Tenant, auth, request-id, and audit middleware must be registered before controllers depend on their context helpers.
+- When adding a route that calls `requireTenantId()` or `requireTenantContext()`, verify the middleware path can establish context for that route family.
+
+---
+
 ## Naming Conventions
 
 - Module folders: lowercase kebab-case only when needed; prefer simple lowercase names (`order`, `payment`, `rental`).

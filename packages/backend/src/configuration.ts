@@ -43,6 +43,7 @@ export class MainConfiguration {
   logger: ILogger;
 
   async onReady() {
+    this.app.useMiddleware(['tenant'] as any);
     this.logger.info('[backend] self-built Midway.js backend ready');
   }
 }

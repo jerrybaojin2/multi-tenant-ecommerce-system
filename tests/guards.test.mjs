@@ -112,6 +112,7 @@ async function createBackendCandidate({
   await mkdir(path.join(root, 'src', 'config'), { recursive: true });
 
   await writeFile(path.join(root, 'src', 'configuration.ts'), configuration);
+  await writeFile(path.join(root, 'src', 'index.ts'), 'export * from "./configuration";\n');
   await writeFile(path.join(root, 'src', 'core', 'tenant', 'tenant-context.ts'), tenantContext);
   await writeFile(path.join(root, 'src', 'core', 'tenant', 'tenant.middleware.ts'), 'export class TenantMiddleware {}\n');
   await writeFile(path.join(root, 'src', 'core', 'database', 'tenant.subscriber.ts'), 'export class TenantSubscriber {}\n');

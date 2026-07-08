@@ -1,9 +1,10 @@
-import { IMiddleware, Middleware } from '@midwayjs/core';
+import { IMiddleware, Middleware, Provide } from '@midwayjs/core';
 import { Context, NextFunction } from '@midwayjs/koa';
 import { randomUUID } from 'node:crypto';
 import { runWithTenantContext, ActorRole } from './tenant-context';
 
 @Middleware()
+@Provide('tenant')
 export class TenantMiddleware implements IMiddleware<Context, NextFunction> {
   resolve() {
     return async (ctx: Context, next: NextFunction) => {

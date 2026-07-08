@@ -1,4 +1,3 @@
-import { EventSubscriberModel } from '@midwayjs/typeorm';
 import {
   DeleteQueryBuilder,
   InsertQueryBuilder,
@@ -11,7 +10,6 @@ import {
   requireTenantId,
 } from '../tenant/tenant-context';
 
-@EventSubscriberModel()
 export class TenantSubscriber {
   afterSelectQueryBuilder(queryBuilder: SelectQueryBuilder<unknown>) {
     const tenantId = tenantIdForRead();

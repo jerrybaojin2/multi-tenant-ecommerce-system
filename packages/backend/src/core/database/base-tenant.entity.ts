@@ -10,8 +10,8 @@ export abstract class BaseTenantEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'tenant_id', type: 'varchar', length: 64, nullable: true })
-  tenantId?: string;
+  @Column({ name: 'tenant_id', type: 'varchar', length: 64 })
+  tenantId: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -1,6 +1,5 @@
 import { MidwayConfig } from '@midwayjs/core';
 import * as path from 'path';
-import { TenantSubscriber } from '../core/database/tenant.subscriber';
 
 export default {
   keys: process.env.APP_KEYS || 'miniapp-rent-platform-dev-key',
@@ -31,7 +30,6 @@ export default {
           '**/modules/**/entity/*.entity{.ts,.js}',
           '**/core/**/entity/*.entity{.ts,.js}',
         ],
-        subscribers: [TenantSubscriber],
         synchronize: false,
         logging: false,
       },

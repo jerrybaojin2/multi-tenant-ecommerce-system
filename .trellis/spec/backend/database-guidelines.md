@@ -131,6 +131,9 @@ Exceptions require all of the following:
 - Bad: implementing `EntitySubscriberInterface` only to expose custom
   `after*QueryBuilder` methods; TypeORM does not define those methods, and the
   build should not pretend they are automatically invoked.
+- Bad: adding `TenantSubscriber` to TypeORM `dataSource.subscribers`; TypeORM
+  will try to instantiate it as a real subscriber even though the project guard
+  methods are not TypeORM lifecycle hooks.
 
 ### 6. Tests Required
 

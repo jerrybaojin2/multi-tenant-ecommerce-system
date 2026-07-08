@@ -29,6 +29,7 @@ export async function verifyBackendArchitecture(candidatePath = 'packages/backen
   }
 
   const requiredFiles = [
+    'src/index.ts',
     'src/configuration.ts',
     'src/core/tenant/tenant-context.ts',
     'src/core/tenant/tenant.middleware.ts',
