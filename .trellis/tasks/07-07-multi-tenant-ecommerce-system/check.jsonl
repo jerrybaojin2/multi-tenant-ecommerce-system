@@ -17,3 +17,4 @@
 {"file":"tests/real-tenant.test.mjs","reason":"Verify real PostgreSQL tenant guard tests and rent_test skip behavior."}
 {"file":"packages/backend/src/core/tenant/tenant-context.ts","reason":"Verify AsyncLocalStorage tenant context contract."}
 {"file":"packages/backend/src/core/database/tenant.subscriber.ts","reason":"Verify PR0 query guard behavior and platform bypass contract."}
+{"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md", "reason": "Verify future work against staged backend app-c admin delivery model"}

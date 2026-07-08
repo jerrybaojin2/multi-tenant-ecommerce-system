@@ -28,3 +28,4 @@
 {"file":"packages/backend/src/core/database/tenant.subscriber.ts","reason":"PR0 project-owned tenant query guard skeleton."}
 {"file":"scripts/verify-backend-architecture.mjs","reason":"Architecture guard for self-built Midway backend markers and forbidden cool-admin runtime dependencies."}
 {"file":"tests/real-tenant.test.mjs","reason":"Real PostgreSQL tenant guard tests using rent_test with clear skip behavior when PostgreSQL is unavailable."}
+{"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md", "reason": "Staged three-surface delivery model for future implementation tasks"}

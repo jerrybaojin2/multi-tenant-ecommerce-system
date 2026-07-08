@@ -23,6 +23,7 @@
   "relatedFiles": [
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md",
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md",
+    ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md",
     ".trellis/spec/backend/index.md",
     ".trellis/spec/backend/database-guidelines.md",
     "packages/backend/src/configuration.ts",
@@ -31,7 +32,7 @@
     "scripts/verify-backend-architecture.mjs",
     "tests/real-tenant.test.mjs"
   ],
-  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. Admin stack remains open for PR1.",
+  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. Admin stack remains open for PR1. Added staged three-surface Trellis breakdown after PR1 backend demo slice.",
   "meta": {
     "architecture": "self-built-midway",
     "backendCommit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
@@ -40,6 +41,22 @@
       "dev": "rent_dev",
       "test": "rent_test"
     },
-    "adminStackDecision": "open-pr1"
+    "adminStackDecision": "open-pr1",
+    "phaseTaskModel": {
+      "parent": "multi-tenant-ecommerce-system",
+      "phases": [
+        "phase-00-foundation",
+        "phase-01-three-surface-skeleton",
+        "phase-02-product-inventory",
+        "phase-03-order-rental-transaction",
+        "phase-04-payment-fulfillment",
+        "phase-05-platform-ops-hardening"
+      ],
+      "surfaces": [
+        "backend",
+        "app-c",
+        "admin"
+      ]
+    }
   }
 }

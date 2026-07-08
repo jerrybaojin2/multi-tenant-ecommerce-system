@@ -4,6 +4,7 @@
 - Current decision: self-built Midway.js 3.x main backend, PostgreSQL, shared database plus `tenant_id`, app-layer tenant context, and later PostgreSQL RLS.
 - Supersedes: the 2026-07-07 cool-admin v8 vendor roadmap. The cool-admin research files remain historical references only.
 - PR0 implementation commit: `bb3ca3958c4bccf86de2b7d60311cae46ebb82e0`
+- Trellis phase split: see `research/phase-task-breakdown.md` for the parent/child task model across backend, C-side, and admin.
 
 ## Cross-PR Guardrails
 
