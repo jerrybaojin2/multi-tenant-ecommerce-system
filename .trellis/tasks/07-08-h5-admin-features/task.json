@@ -1,0 +1,49 @@
+{
+  "title": "H5 与 Admin 功能点梳理",
+  "description": "系统性地梳理二期 H5 前端页面和管理后台（商家端 + 平台端）的功能点，为后续 PR1/PR3-PR9 实现提供清晰的功能范围和验收标准。",
+  "status": "planning",
+  "created_at": "2026-07-08",
+  "updated_at": "2026-07-08",
+  "type": "brainstorm",
+  "phase": "需求发现",
+  "scope": [
+    "h5-frontend",
+    "admin-merchant",
+    "admin-platform",
+    "permission-management"
+  ],
+  "decisions": [
+    {
+      "topic": "H5 定位",
+      "decision": "独立商城，单一商家域名模式",
+      "rationale": "每商家有独立 H5 站点，租户上下文从域名/VITE_TENANT_ID 获取"
+    },
+    {
+      "topic": "H5 与小程序关系",
+      "decision": "功能完全对等",
+      "rationale": "两个端只是承载端不同，功能模块一致"
+    },
+    {
+      "topic": "租赁履约",
+      "decision": "留作二期迭代",
+      "rationale": "MVP 专注零售流程，数据模型和状态机预留扩展点"
+    },
+    {
+      "topic": "物流方案",
+      "decision": "运费模板自建，快递鸟负责物流跟踪和电子面单",
+      "rationale": "运费是商家定价策略（非物流成本），需自建；物流查询/面单由快递鸟提供"
+    },
+    {
+      "topic": "新增功能",
+      "decision": "商品分类/评价/收藏/售后/客服/营销（优惠券/会员）/内容管理",
+      "rationale": "常见商城系统必备功能"
+    }
+  ],
+  "deliverables": [
+    "prd.md - 功能点清单",
+    "与后端 API/数据模型对应关系映射（后续）"
+  ],
+  "parent": null,
+  "subtasks": [],
+  "related_pr": ["PR1", "PR3", "PR4", "PR5", "PR6", "PR7", "PR8", "PR9"]
+}
