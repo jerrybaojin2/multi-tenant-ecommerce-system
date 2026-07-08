@@ -1,16 +1,19 @@
-{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Backend quality review entry for forbidden patterns and maintainability checks."}
-{"file":".trellis/spec/backend/database-guidelines.md","reason":"Review tenant_id isolation, TypeORM usage, migrations, raw SQL, and database safety."}
-{"file":".trellis/spec/backend/error-handling.md","reason":"Review error boundaries for tenant/auth/payment/fulfillment/plugin failure cases."}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Backend quality review entry for self-built Midway backend forbidden patterns and guardrails."}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"Review tenant_id isolation, tenant context, PR0 query guard contract, raw SQL limits, and PostgreSQL/RLS path."}
+{"file":".trellis/spec/backend/error-handling.md","reason":"Review error boundaries for tenant/auth/payment/fulfillment/platform failure cases."}
 {"file":".trellis/spec/backend/logging-guidelines.md","reason":"Review tenant-aware logging and audit trail expectations."}
-{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Frontend quality review entry for UI, state, and maintainability checks."}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"Review module boundaries for core, platform, merchant, consumer, order, rental, payment, and funds code."}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Frontend quality review entry for future C-side/admin work."}
 {"file":".trellis/spec/frontend/type-safety.md","reason":"Review API contracts, product/order model typing, and rental/retail discriminants."}
 {"file":".trellis/spec/frontend/state-management.md","reason":"Review tenant-scoped cart/session/order state behavior."}
-{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check cross-layer consistency from DB entity to API to frontend flow."}
-{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check for duplicated domain logic and reusable abstractions."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/cool-admin-multi-tenant.md","reason":"Verify implementation respects cool-admin v8 tenant constraints and raw SQL risks."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/plugin-architecture.md","reason":"Verify plugin boundaries, lifecycle, and C-side mini-program limitations."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-uni-stack.md","reason":"Verify frontend stack assumptions and tenant header/cart behavior."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md","reason":"Verify PR scope/dependencies/acceptance are met; check agent assignment and parallel/serial wave constraints."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/fulfillment-order-fsm.md","reason":"Verify order main+item+rental-subtable model and dual-layer state machine correctness; check mixed-cart and fund-ledger linkage."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/payment-funds.md","reason":"Verify split-pay compliance, deposit ledger, sub_mchid→tenant callback resolution; ensure no 二清 (fund-pooling) risk."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-cross-platform.md","reason":"Verify 5 frontend gotchas are fixed (router glob covers plugins, X-Tenant-Id injected, eps path, repo name) and dual-brand build works."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check cross-layer consistency from database to API to C-side/admin flows."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check for duplicated domain logic and reusable helpers."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md","reason":"Verify current decisions: self-built Midway.js backend, PostgreSQL, tenant_id isolation, admin stack open for PR1."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md","reason":"Verify PR scope/dependencies/acceptance align with the current self-built Midway roadmap."}
+{"file":"scripts/verify-backend-architecture.mjs","reason":"Verify backend architecture guard rejects cool-admin runtime packages and requires Midway/tenant context markers."}
+{"file":"scripts/check-prod-config.mjs","reason":"Verify production config guard checks synchronize:false and appMeta.exposeDevMetadata:false."}
+{"file":"tests/guards.test.mjs","reason":"Verify architecture and production guard behavior."}
+{"file":"tests/tenant-isolation.test.mjs","reason":"Verify dependency-free tenant isolation semantics."}
+{"file":"tests/real-tenant.test.mjs","reason":"Verify real PostgreSQL tenant guard tests and rent_test skip behavior."}
+{"file":"packages/backend/src/core/tenant/tenant-context.ts","reason":"Verify AsyncLocalStorage tenant context contract."}
+{"file":"packages/backend/src/core/database/tenant.subscriber.ts","reason":"Verify PR0 query guard behavior and platform bypass contract."}

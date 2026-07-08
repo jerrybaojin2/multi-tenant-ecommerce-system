@@ -1,24 +1,30 @@
-{"file":".trellis/spec/backend/index.md","reason":"Backend guideline entry point for cool-admin/Midway implementation context."}
-{"file":".trellis/spec/backend/directory-structure.md","reason":"Backend module layout guidance for platform, merchant, consumer API, tenant, order, and plugin domains."}
-{"file":".trellis/spec/backend/database-guidelines.md","reason":"Database and ORM guidance for tenant_id isolation, TypeORM entities, migrations, and query constraints."}
-{"file":".trellis/spec/backend/error-handling.md","reason":"Backend error handling expectations for auth, tenant isolation, payment, fulfillment, and plugin failures."}
-{"file":".trellis/spec/backend/logging-guidelines.md","reason":"Logging guidance for tenant-aware auditability and operational debugging."}
-{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Backend quality gates and forbidden patterns for implementation."}
-{"file":".trellis/spec/frontend/index.md","reason":"Frontend guideline entry point for uni-app and admin UI implementation context."}
-{"file":".trellis/spec/frontend/directory-structure.md","reason":"Frontend layout guidance for C-side uni-app and admin/B-side surfaces."}
-{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Component design guidance for reusable product, cart, order, and rental UI components."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md","reason":"Current PRD: self-built Midway.js main backend, PostgreSQL, tenant_id isolation, admin stack open for PR1."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md","reason":"Current MVP PR roadmap aligned to self-built Midway.js backend and PR0/PR1 sequencing."}
+{"file":".trellis/spec/backend/index.md","reason":"Backend guideline entry point for the self-built Midway.js/PostgreSQL implementation."}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"Backend module layout for core tenant/auth/database primitives plus platform, merchant, consumer, order, rental, payment, and funds modules."}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"Database and tenant isolation contracts: tenant_id, tenant context, PR0 query guard, raw SQL limits, production sync guard, and RLS path."}
+{"file":".trellis/spec/backend/error-handling.md","reason":"Backend error handling expectations for tenant, auth, payment, fulfillment, and platform operations."}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"Logging and audit guidance for tenant-aware operations and sensitive-data handling."}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Backend quality gates and forbidden patterns for the self-built Midway backend."}
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend guideline entry point for uni-app C-side and future admin implementation."}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"Frontend layout guidance for C-side uni-app and future admin surfaces."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Component design guidance for reusable product, cart, order, rental, and admin UI components."}
 {"file":".trellis/spec/frontend/hook-guidelines.md","reason":"Composable/hook guidance for API access, tenant context, and cross-page state."}
 {"file":".trellis/spec/frontend/state-management.md","reason":"State guidance for tenant-scoped cart, user session, order flow, and UI state."}
 {"file":".trellis/spec/frontend/type-safety.md","reason":"Type safety guidance for API contracts, order models, and rental/retail product types."}
 {"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Frontend quality gates and forbidden patterns for implementation."}
-{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer data flow guidance for product, order, tenant, payment, and plugin flows."}
-{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse guidance before creating shared tenant/order/product/plugin utilities."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/cool-admin-multi-tenant.md","reason":"Primary backend platform decision: cool-admin v8 multi-tenant behavior, constraints, and risks."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/plugin-architecture.md","reason":"Plugin lifecycle, install/uninstall, Midway mapping, and mini-program runtime constraints."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer data flow guidance for product, order, tenant, payment, and extension flows."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse guidance before creating shared tenant/order/product/payment helpers."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-framework.md","reason":"Framework comparison history; Midway.js remains relevant as the chosen main backend family."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-orm-db.md","reason":"ORM/database comparison history and PostgreSQL/RLS safety conclusions."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/cool-admin-multi-tenant.md","reason":"Historical reference only: explains why cool-admin v8 was considered, but it is no longer the target architecture."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/plugin-architecture.md","reason":"Historical reference for extension ideas; current plan uses project-owned modules and Strategy extension points, not cool-admin runtime plugins."}
 {"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-uni-stack.md","reason":"C-side frontend stack decision: uni-app Vue3, wot-design-uni, Pinia, and tenant headers."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-framework.md","reason":"Framework comparison history and rationale for rejecting the earlier NestJS approach."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/backend-orm-db.md","reason":"ORM/database comparison history and rationale for TypeORM/PostgreSQL direction."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md","reason":"PR-by-PR breakdown: scope, dependencies, acceptance, agent assignment — authoritative roadmap for every PR."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/fulfillment-order-fsm.md","reason":"Order model (main table + item-level type + rental subtable) and dual-layer state machine for retail+rental — core for PR3/PR5/PR7."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/payment-funds.md","reason":"WeChat service-provider split-pay + prepaid deposit + independent fund ledger — core for PR6; tenant=sub_mchid callback resolution."}
-{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-cross-platform.md","reason":"C-side MP-only scope, admin dual-brand build, 5 frontend gotchas (router glob/plugins, X-Tenant-Id, eps path, repo name) — core for C/admin PRs."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/frontend-cross-platform.md","reason":"Historical admin/C-side research; admin implementation remains open for PR1 and should not assume cool-admin-vue as current target."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/fulfillment-order-fsm.md","reason":"Order model and dual-layer state machine research for PR3/PR5/PR7."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/payment-funds.md","reason":"Payment/funds research for PR6; adapt implementation to project-owned payment Strategy modules."}
+{"file":"packages/backend/src/configuration.ts","reason":"PR0 self-built Midway.js application bootstrap."}
+{"file":"packages/backend/src/core/tenant/tenant-context.ts","reason":"PR0 tenant context helper using AsyncLocalStorage."}
+{"file":"packages/backend/src/core/database/tenant.subscriber.ts","reason":"PR0 project-owned tenant query guard skeleton."}
+{"file":"scripts/verify-backend-architecture.mjs","reason":"Architecture guard for self-built Midway backend markers and forbidden cool-admin runtime dependencies."}
+{"file":"tests/real-tenant.test.mjs","reason":"Real PostgreSQL tenant guard tests using rent_test with clear skip behavior when PostgreSQL is unavailable."}

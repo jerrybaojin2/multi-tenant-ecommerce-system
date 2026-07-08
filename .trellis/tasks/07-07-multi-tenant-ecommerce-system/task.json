@@ -2,7 +2,7 @@
   "id": "multi-tenant-ecommerce-system",
   "name": "multi-tenant-ecommerce-system",
   "title": "multi-tenant-ecommerce-system",
-  "description": "",
+  "description": "Multi-tenant rental + retail SaaS. Current backend direction is a self-built Midway.js 3.x main backend with PostgreSQL, tenant_id isolation, tenant context, and later RLS defense-in-depth.",
   "status": "in_progress",
   "dev_type": null,
   "scope": null,
@@ -12,15 +12,34 @@
   "assignee": "jerry",
   "createdAt": "2026-07-07",
   "completedAt": null,
-  "branch": null,
+  "branch": "main",
   "base_branch": "main",
   "worktree_path": null,
-  "commit": null,
+  "commit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
   "pr_url": null,
   "subtasks": [],
   "children": [],
   "parent": null,
-  "relatedFiles": [],
-  "notes": "",
-  "meta": {}
+  "relatedFiles": [
+    ".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md",
+    ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md",
+    ".trellis/spec/backend/index.md",
+    ".trellis/spec/backend/database-guidelines.md",
+    "packages/backend/src/configuration.ts",
+    "packages/backend/src/core/tenant/tenant-context.ts",
+    "packages/backend/src/core/database/tenant.subscriber.ts",
+    "scripts/verify-backend-architecture.mjs",
+    "tests/real-tenant.test.mjs"
+  ],
+  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. Admin stack remains open for PR1.",
+  "meta": {
+    "architecture": "self-built-midway",
+    "backendCommit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
+    "backendCommitShort": "bb3ca39",
+    "database": {
+      "dev": "rent_dev",
+      "test": "rent_test"
+    },
+    "adminStackDecision": "open-pr1"
+  }
 }
