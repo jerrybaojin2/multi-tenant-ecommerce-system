@@ -74,6 +74,7 @@ describe('DemoResourceService', () => {
   it('uses context tenant id when creating resources', async () => {
     const service = createService();
 
+    // 即使请求体夹带其他租户，也必须落到当前上下文租户。
     const created = await runWithTenantContext(
       { role: 'merchant', tenantId: 'tenant-a' },
       () =>
@@ -94,6 +95,7 @@ describe('DemoResourceService', () => {
   it('lets platform context list all tenant resources', async () => {
     const service = createService();
 
+    // 平台态是唯一允许跨租户读取 demo 资源的上下文。
     const rows = await runWithTenantContext({ role: 'platform' }, () =>
       service.listForPlatform()
     );

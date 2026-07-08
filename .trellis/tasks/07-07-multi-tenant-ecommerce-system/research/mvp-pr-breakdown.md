@@ -1,171 +1,171 @@
-# MVP PR Breakdown - Multi-Tenant Rental + Retail SaaS
+# MVP PR 拆分 - 多租户租售 SaaS
 
-- Date: 2026-07-08
-- Current decision: self-built Midway.js 3.x main backend, PostgreSQL, shared database plus `tenant_id`, app-layer tenant context, and later PostgreSQL RLS.
-- Supersedes: the 2026-07-07 cool-admin v8 vendor roadmap. The cool-admin research files remain historical references only.
-- PR0 implementation commit: `bb3ca3958c4bccf86de2b7d60311cae46ebb82e0`
-- Trellis phase split: see `research/phase-task-breakdown.md` for the parent/child task model across backend, C-side, and admin.
+- 日期: 2026-07-08
+- 当前决策: 自研 Midway.js 3.x 主后端、PostgreSQL、共享数据库加 `tenant_id`、应用层租户上下文，并在后续引入 PostgreSQL RLS。
+- 取代内容: 2026-07-07 的 cool-admin v8 vendor 路线图。cool-admin 研究文件仅保留为历史参考。
+- PR0 实现 commit: `bb3ca3958c4bccf86de2b7d60311cae46ebb82e0`
+- Trellis 阶段拆分: 后端、C 端和 admin 的父/子任务模型见 `research/phase-task-breakdown.md`。
 
-## Cross-PR Guardrails
+## 跨 PR 守护规则
 
-1. Backend business workflows live in the Midway.js backend, not in Next.js API routes or frontend code.
-2. Tenant-owned tables must include `tenant_id`; TypeScript code exposes this as `tenantId`.
-3. Tenant context is resolved from trusted auth/request boundaries, then read from backend context helpers.
-4. Client request bodies must not control tenant-owned write scope.
-5. Raw SQL in tenant-scoped business code is forbidden unless routed through an approved tenant-aware helper and covered by tests.
-6. Platform cross-tenant reads/writes require explicit platform services, role guards, and audit logging.
-7. Production config keeps `synchronize:false` and `appMeta.exposeDevMetadata:false`.
-8. C-side MVP is WeChat mini-program only. Runtime plugin loading is out of scope for the mini-program client.
-9. Payment callbacks and scheduled jobs must establish tenant context explicitly because they do not naturally have a user JWT.
+1. 后端业务流程必须位于 Midway.js 后端中，不放在 Next.js API routes 或前端代码中。
+2. 租户归属表必须包含 `tenant_id`；TypeScript 代码中暴露为 `tenantId`。
+3. 租户上下文从可信的 auth/request 边界解析，然后由后端上下文 helper 读取。
+4. 客户端请求体不得控制租户归属写入范围。
+5. 租户作用域业务代码中禁止 raw SQL，除非通过已批准的 tenant-aware helper 路由并有测试覆盖。
+6. 平台跨租户读写必须使用显式平台服务、角色守护和审计日志。
+7. 生产配置保持 `synchronize:false` 和 `appMeta.exposeDevMetadata:false`。
+8. C 端 MVP 仅微信小程序。小程序客户端不支持运行时插件加载，此项不在范围内。
+9. 支付回调和定时任务没有天然的用户 JWT，必须显式建立租户上下文。
 
-## PR Overview
+## PR 总览
 
 ```text
-PR0  Self-built Midway backend foundation + tenant isolation guards
-  -> PR1  Three-surface walking skeleton
-      -> PR2  CI/lint guardrails + migrations/RLS preparation
-      -> PR3  Rental + retail product model
-          -> PR4  Inventory and rental availability
-              -> PR5  Order and rental state machines
-                  -> PR6  Payment, deposit, and funds ledger
-                      -> PR7  Rental fulfillment
-      -> PR8  Extension strategy demo
-      -> PR9  Platform operations
+PR0  自研 Midway 后端基础 + 租户隔离守护
+  -> PR1  三端 walking skeleton
+      -> PR2  CI/lint 守护 + 迁移/RLS 准备
+      -> PR3  租赁 + 零售商品模型
+          -> PR4  库存与租赁可用性
+              -> PR5  订单与租赁状态机
+                  -> PR6  支付、押金与资金台账
+                      -> PR7  租赁履约
+      -> PR8  扩展 Strategy demo
+      -> PR9  平台运营
 ```
 
-## PR0 - Self-Built Midway Foundation
+## PR0 - 自研 Midway 基础
 
-- Status: implemented in `bb3ca39`.
-- Scope:
-  - Remove cool-admin runtime/vendor backend source.
-  - Create Midway.js 3.x bootstrap, config, health/platform/consumer ping controllers.
-  - Add tenant context helper, tenant middleware, tenant-scoped base entity, and PR0 query guard skeleton.
-  - Add architecture guard that rejects `@cool-midway/*` runtime dependencies.
-  - Add production config guard for `synchronize:false` and `appMeta.exposeDevMetadata:false`.
-  - Rename local databases to `rent_dev` and `rent_test`.
-  - Update README, env, Cursor, and VSCode templates so new code is generated in project-owned Midway style.
-- Acceptance:
-  - `npm run check` passes.
-  - `packages/backend npm run build` passes.
-  - `packages/backend npm run lint` passes.
-  - Real PostgreSQL tenant tests use `rent_test` and skip clearly when PostgreSQL is unavailable.
+- 状态: 已在 `bb3ca39` 实现。
+- 范围:
+  - 移除 cool-admin runtime/vendor 后端源码。
+  - 创建 Midway.js 3.x bootstrap、配置、health/platform/consumer ping controllers。
+  - 添加租户上下文 helper、租户 middleware、tenant-scoped base entity 和 PR0 query guard 骨架。
+  - 添加拒绝 `@cool-midway/*` runtime dependencies 的架构守护。
+  - 添加 `synchronize:false` 和 `appMeta.exposeDevMetadata:false` 的生产配置守护。
+  - 将本地数据库重命名为 `rent_dev` 和 `rent_test`。
+  - 更新 README、env、Cursor 和 VSCode 模板，使新代码按项目自有 Midway 风格生成。
+- 验收:
+  - `npm run check` 通过。
+  - `packages/backend npm run build` 通过。
+  - `packages/backend npm run lint` 通过。
+  - 真实 PostgreSQL 租户测试使用 `rent_test`，PostgreSQL 不可用时清晰跳过。
 
-## PR1 - Three-Surface Walking Skeleton
+## PR1 - 三端 Walking Skeleton
 
-- Scope:
-  - Backend: create a real tenant-scoped demo resource behind `/admin/merchant/**`, `/admin/platform/**`, and `/app/consumer/**`.
-  - C-side: uni-app Vue3 skeleton with tenant-aware request wrapper and one demo page.
-  - Admin: choose Next.js or Vue before implementation, then land login shell, route shell, and role-aware menu placeholder.
-- Acceptance:
-  - Merchant context sees only its tenant data.
-  - Platform role can intentionally see cross-tenant demo data through a platform route.
-  - C-side request carries validated tenant context.
-  - Admin stack decision is recorded in PRD and frontend spec.
+- 范围:
+  - 后端: 在 `/admin/merchant/**`、`/admin/platform/**` 和 `/app/consumer/**` 后面创建真实 tenant-scoped demo resource。
+  - C 端: uni-app Vue3 骨架，包含 tenant-aware 请求封装和一个 demo 页面。
+  - Admin: 实现前选择 Next.js 或 Vue，然后落地登录壳、路由壳和角色感知菜单占位。
+- 验收:
+  - 商家上下文只能看到本租户数据。
+  - 平台角色可以通过平台路由有意查看跨租户 demo 数据。
+  - C 端请求携带已校验的租户上下文。
+  - Admin 技术栈决策记录在 PRD 和前端 spec 中。
 
-## PR2 - CI, Raw SQL Guard, Migrations, RLS Preparation
+## PR2 - CI、Raw SQL 守护、迁移、RLS 准备
 
-- Scope:
-  - Add lint/review guard against `repository.query`, `dataSource.query`, and string-built SQL in tenant modules.
-  - Add migration skeleton and document when schema auto-sync is allowed locally.
-  - Add RLS helper/prototype for a single tenant table after migrations exist.
-  - Keep production guard wired into root checks.
-- Acceptance:
-  - Deliberate raw SQL fixture fails lint/check.
-  - Production guard fails on `synchronize:true` or exposed dev metadata.
-  - Migration path can create the demo tenant table.
+- 范围:
+  - 在租户模块中添加针对 `repository.query`、`dataSource.query` 和字符串拼接 SQL 的 lint/review 守护。
+  - 添加迁移骨架，并记录本地何时允许 schema auto-sync。
+  - 迁移存在后，为单个租户表添加 RLS helper/prototype。
+  - 保持生产守护接入根检查。
+- 验收:
+  - 故意放置的 raw SQL fixture 会导致 lint/check 失败。
+  - 遇到 `synchronize:true` 或暴露 dev metadata 时，生产守护失败。
+  - 迁移路径可以创建 demo 租户表。
 
-## PR3 - Rental + Retail Product Model
+## PR3 - 租赁 + 零售商品模型
 
-- Scope:
-  - Product/SKU entities with sale fields and rental fields.
-  - Rental pricing rules in JSONB only where flexible structure is needed.
-  - Admin product configuration pages.
-  - C-side product list/detail with rent and buy entry points.
-- Acceptance:
-  - Same product can be sale-only, rental-only, or both.
-  - Tenant isolation regression covers product list/detail/update/delete.
-  - C-side can calculate an estimated rental price.
+- 范围:
+  - Product/SKU entities，包含售卖字段和租赁字段。
+  - 仅在需要灵活结构的位置使用 JSONB 保存租赁计价规则。
+  - Admin 商品配置页面。
+  - C 端商品列表/详情，包含租赁与购买入口。
+- 验收:
+  - 同一商品可以仅售卖、仅租赁或同时支持两者。
+  - 租户隔离回归覆盖商品列表/详情/更新/删除。
+  - C 端可以计算预计租金。
 
-## PR4 - Inventory And Rental Availability
+## PR4 - 库存与租赁可用性
 
-- Scope:
-  - Retail stock quantity.
-  - Rental availability/reservation model.
-  - Transactional reserve, confirm, release operations.
-  - Admin inventory dashboard.
-- Acceptance:
-  - Concurrent sale orders cannot oversell.
-  - Overlapping rental windows are rejected.
-  - Tenant isolation applies to all inventory operations.
+- 范围:
+  - 零售库存数量。
+  - 租赁可用性/预约模型。
+  - 事务化 reserve、confirm、release 操作。
+  - Admin 库存看板。
+- 验收:
+  - 并发售卖订单不能超卖。
+  - 重叠租赁窗口会被拒绝。
+  - 租户隔离适用于所有库存操作。
 
-## PR5 - Orders And State Machines
+## PR5 - 订单与状态机
 
-- Scope:
-  - Order header, order items, sale/rental item types, rental subtable, and rental event stream.
-  - Explicit state transition tables for sale transaction state and rental fulfillment state.
-  - C-side checkout/order list/detail.
-  - Admin order management and fulfillment action entry points.
-- Acceptance:
-  - Legal transitions are covered by parameterized tests.
-  - Illegal transitions are rejected.
-  - Cancel/refund releases inventory correctly.
-  - Mixed rental/sale cart is persisted without cross-tenant order mixing.
+- 范围:
+  - 订单主信息、订单行、售卖/租赁行类型、租赁子表和租赁事件流。
+  - 为售卖交易状态和租赁履约状态建立显式状态转移表。
+  - C 端结算/订单列表/订单详情。
+  - Admin 订单管理和履约动作入口。
+- 验收:
+  - 合法转移由参数化测试覆盖。
+  - 非法转移会被拒绝。
+  - 取消/退款能正确释放库存。
+  - 租售混合购物车可持久化，且不会跨租户混合订单。
 
-## PR6 - Payment, Deposit, And Funds Ledger
+## PR6 - 支付、押金与资金台账
 
-- Scope:
-  - Project-owned `PaymentChannel` Strategy interface.
-  - Mock payment channel first, then WeChat/Alipay/cross-border adapters later.
-  - Deposit, rent, and goods payment ledgers as separate financial records.
-  - Idempotent provider callback handling.
-- Acceptance:
-  - Duplicate callbacks do not advance state twice.
-  - Deposit freeze/unfreeze/deduct/refund flows are tested.
-  - Payment callbacks resolve tenant from trusted provider merchant identifiers.
+- 范围:
+  - 项目自有 `PaymentChannel` Strategy 接口。
+  - 先实现 mock payment channel，之后再接 WeChat/Alipay/cross-border adapters。
+  - 将押金、租金和货款支付台账作为独立财务记录。
+  - Provider 回调处理具备幂等性。
+- 验收:
+  - 重复回调不会推进两次状态。
+  - 押金 freeze/unfreeze/deduct/refund 流程已测试。
+  - 支付回调从可信 provider merchant identifiers 解析租户。
 
-## PR7 - Rental Fulfillment
+## PR7 - 租赁履约
 
-- Scope:
-  - Delivery/outbound, return inspection, renew, overdue scan, buyout, and deposit settlement.
-  - Scheduled jobs iterate tenants explicitly and isolate failures.
-- Acceptance:
-  - Return damage settlement updates deposit ledger correctly.
-  - Renew extends availability without conflicts.
-  - Overdue scheduled scan processes tenants independently.
+- 范围:
+  - 发货/出库、归还验机、续租、逾期扫描、买断和押金结算。
+  - 定时任务显式遍历租户并隔离失败。
+- 验收:
+  - 归还损坏结算能正确更新押金台账。
+  - 续租能延长可用性且不产生冲突。
+  - 逾期定时扫描独立处理各租户。
 
-## PR8 - Extension Strategy Demo
+## PR8 - 扩展 Strategy Demo
 
-- Scope:
-  - Demonstrate project-owned module/Strategy extension points without cool-admin plugin runtime.
-  - Candidate: payment channel sandbox, announcement module, or rental pricing strategy.
-  - Admin configuration surface for enabling/disabling a feature per tenant.
-- Acceptance:
-  - Feature can be enabled/disabled per tenant.
-  - Extension data remains tenant-scoped.
-  - C-side extension surface is build-time/route-time only, not runtime JS loading.
+- 范围:
+  - 演示项目自有 module/Strategy 扩展点，不依赖 cool-admin plugin runtime。
+  - 候选: 支付通道 sandbox、公告模块或租赁计价 Strategy。
+  - Admin 配置表面，支持按租户开启/关闭功能。
+- 验收:
+  - 功能可以按租户启用/禁用。
+  - 扩展数据保持 tenant-scoped。
+  - C 端扩展表面仅支持构建期/路由期，不做 runtime JS loading。
 
-## PR9 - Platform Operations
+## PR9 - 平台运营
 
-- Scope:
-  - Merchant onboarding, qualification, package binding, platform overview, and simulated settlement/split ledger.
-  - Platform-only cross-tenant services with audit logging.
-- Acceptance:
-  - Onboarding creates an isolated tenant and initial merchant admin.
-  - Platform overview uses platform-only services, not ordinary merchant routes.
-  - Settlement records reconcile against PR6 funds ledger.
+- 范围:
+  - 商家入驻、资质、套餐绑定、平台概览和模拟结算/分账台账。
+  - 带审计日志的平台专用跨租户服务。
+- 验收:
+  - 入驻会创建隔离租户和初始商家管理员。
+  - 平台概览使用平台专用服务，而不是普通商家路由。
+  - 结算记录能与 PR6 资金台账对账。
 
-## Agent Mapping
+## Agent 映射
 
-| Agent | PRs | Focus |
+| Agent | PRs | 关注点 |
 |---|---|---|
-| backend-agent | PR0-PR9 backend slices | Midway modules, tenant context, PostgreSQL, transactions, state machines |
-| c-frontend-agent | PR1, PR3, PR5, PR6, PR7 | uni-app Vue3, tenant request wrapper, cart/order/rental UX |
-| admin-frontend-agent | PR1, PR3, PR4, PR5, PR7, PR8, PR9 | Admin shell, product/order/inventory/platform pages |
-| payment-agent | PR6, PR9 | Payment channel Strategy, callbacks, funds ledger, settlement |
-| reviewer-agent | every PR | Spec compliance, tenant isolation, production guardrails, test coverage |
+| backend-agent | PR0-PR9 backend slices | Midway modules、租户上下文、PostgreSQL、事务、状态机 |
+| c-frontend-agent | PR1, PR3, PR5, PR6, PR7 | uni-app Vue3、租户请求封装、购物车/订单/租赁 UX |
+| admin-frontend-agent | PR1, PR3, PR4, PR5, PR7, PR8, PR9 | Admin shell、商品/订单/库存/平台页面 |
+| payment-agent | PR6, PR9 | Payment channel Strategy、回调、资金台账、结算 |
+| reviewer-agent | every PR | Spec 合规、租户隔离、生产守护、测试覆盖 |
 
-## Open Decisions Before PR1/PR2
+## PR1/PR2 前的未决决策
 
-- Admin stack: Next.js or Vue.
-- ORM/migration stack: continue TypeORM, or switch to Drizzle/Prisma before business tables harden.
-- Compliance prerequisites: ICP/EDI, WeChat/Alipay service-provider onboarding, cross-border account/data compliance.
+- Admin 技术栈: Next.js 或 Vue。
+- ORM/迁移栈: 继续 TypeORM，还是在业务表固化前切换到 Drizzle/Prisma。
+- 合规前置条件: ICP/EDI、WeChat/Alipay 服务商进件、跨境账户/数据合规。

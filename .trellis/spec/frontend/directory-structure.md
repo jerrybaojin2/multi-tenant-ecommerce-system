@@ -1,23 +1,23 @@
-# Directory Structure
+# 目录结构
 
-> How frontend code is organized for the uni-app C-end and cool-admin-vue admin.
-
----
-
-## Overview
-
-Keep the C-end and admin frontends separate because they have different runtime constraints:
-
-- C-end uses uni-app pages, `pages.json`, mini-program subpackages, `uni.request`, and wot-design-uni.
-- Admin uses cool-admin-vue modules/plugins, Vue Router, backend-driven menus, and brand-specific builds.
-
-Do not mix admin abstractions into C-end code. Do not design C-end code around runtime route/component loading; WeChat mini-program pages must be statically registered.
+> uni-app C-end 与 cool-admin-vue admin 的前端代码如何组织。
 
 ---
 
-## C-End Layout
+## 概览
 
-Recommended C-end layout:
+保持 C 端和 admin 前端分离，因为它们有不同运行时约束：
+
+- C 端使用 uni-app pages、`pages.json`、mini-program subpackages、`uni.request` 和 wot-design-uni。
+- Admin 使用 cool-admin-vue modules/plugins、Vue Router、后端驱动菜单和按品牌构建。
+
+不要把 admin 抽象混入 C 端代码。不要围绕运行时 route/component loading 设计 C 端代码；微信小程序 pages 必须静态注册。
+
+---
+
+## C-End 布局
+
+推荐 C-end layout：
 
 ```text
 src/
@@ -53,18 +53,18 @@ src/
   static/                 # tenant/brand assets selected by build configuration
 ```
 
-Rules:
+规则：
 
-- Main package contains only launch, tabBar, login, and shared components needed immediately.
-- Rental fulfillment, order detail, activity/marketing, and optional tenant features live in `subpackages/`.
-- C-end plugins are represented as subpackages selected at build time by tenant/package configuration.
-- `pages.json` is the route registry. Do not introduce vue-router into the C-end mini-program.
+- Main package 只包含 launch、tabBar、login，以及立即需要的 shared components。
+- Rental fulfillment、order detail、activity/marketing 和 optional tenant features 放在 `subpackages/` 中。
+- C-end plugins 表示为由 tenant/package configuration 在 build time 选择的 subpackages。
+- `pages.json` 是路由注册表。不要把 vue-router 引入 C 端小程序。
 
 ---
 
-## Admin Layout
+## Admin 布局
 
-Use cool-admin-vue 8.x conventions:
+使用 cool-admin-vue 8.x conventions：
 
 ```text
 src/
@@ -83,29 +83,29 @@ src/
       locales/
 ```
 
-Rules:
+规则：
 
-- Build with `vite build --mode merchant` or `vite build --mode platform`.
-- `.env.merchant` and `.env.platform` set `VITE_BRAND`, `VITE_NAME`, API base, and theme values.
-- Brand-specific module enablement belongs in module/plugin `config.ts`; avoid scattering `if brand` checks across views.
-- Menus and permissions come from the backend `permmenu` flow. Frontend routes should follow returned menu data and view paths.
-- If plugin admin pages are routed by backend `viewPath`, make sure the route glob includes both `modules/*` and `plugins/*` views when implementation reaches that PR.
-
----
-
-## Naming Conventions
-
-- Vue SFC files use kebab-case: `goods-card.vue`, `rent-buy-switch.vue`.
-- Pinia stores use domain names: `tenant.ts`, `cart.ts`, `auth.ts`.
-- Composables use `use-*.ts`: `use-tenant-request.ts`, `use-rental-timeline.ts`.
-- API clients are grouped by backend domain: `goods.ts`, `order.ts`, `pay.ts`.
-- Types use domain files under `types/` or colocated `*.types.ts` when only one module consumes them.
+- 使用 `vite build --mode merchant` 或 `vite build --mode platform` 构建。
+- `.env.merchant` 和 `.env.platform` 设置 `VITE_BRAND`、`VITE_NAME`、API base 和 theme values。
+- 按品牌启用 module 属于 module/plugin `config.ts`；避免在 views 中分散 `if brand` checks。
+- Menus 和 permissions 来自后端 `permmenu` flow。前端路由应遵循返回的 menu data 和 view paths。
+- 如果 plugin admin pages 由后端 `viewPath` 路由，当实现进入对应 PR 时，确认 route glob 同时包含 `modules/*` 和 `plugins/*` views。
 
 ---
 
-## Module Organization
+## 命名约定
 
-- Put shared UI in `components/` only when at least two pages use it.
-- Keep page-only components beside the page or subpackage when they are not reusable.
-- Keep business calculations in composables or pure utilities, not inside templates.
-- Keep tenant, auth, cart, and rental state in separate stores. Tenant and cart must remain decoupled.
+- Vue SFC files 使用 kebab-case：`goods-card.vue`、`rent-buy-switch.vue`。
+- Pinia stores 使用 domain names：`tenant.ts`、`cart.ts`、`auth.ts`。
+- Composables 使用 `use-*.ts`：`use-tenant-request.ts`、`use-rental-timeline.ts`。
+- API clients 按 backend domain 分组：`goods.ts`、`order.ts`、`pay.ts`。
+- Types 放在 `types/` 下的 domain files 中；若只有一个 module 消费，也可共置为 `*.types.ts`。
+
+---
+
+## 模块组织
+
+- 只有至少两个 pages 使用时，才把 shared UI 放入 `components/`。
+- 不可复用的 page-only components 放在对应 page 或 subpackage 旁边。
+- Business calculations 放在 composables 或 pure utilities 中，不放在 templates 内。
+- Tenant、auth、cart 和 rental state 放在独立 stores 中。Tenant 和 cart 必须保持解耦。

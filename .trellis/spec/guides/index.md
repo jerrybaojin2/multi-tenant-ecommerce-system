@@ -1,79 +1,79 @@
-# Thinking Guides
+# 思考指南
 
-> **Purpose**: Expand your thinking to catch things you might not have considered.
-
----
-
-## Why Thinking Guides?
-
-**Most bugs and tech debt come from "didn't think of that"**, not from lack of skill:
-
-- Didn't think about what happens at layer boundaries → cross-layer bugs
-- Didn't think about code patterns repeating → duplicated code everywhere
-- Didn't think about edge cases → runtime errors
-- Didn't think about future maintainers → unreadable code
-
-These guides help you **ask the right questions before coding**.
+> **目的**：扩展思考范围，帮助你捕捉可能遗漏的问题。
 
 ---
 
-## Available Guides
+## 为什么需要思考指南？
 
-| Guide | Purpose | When to Use |
+**大多数缺陷和技术债都来自“没有想到这一点”**，而不是能力不足：
+
+- 没有想到层边界会发生什么 -> 跨层缺陷
+- 没有想到代码模式正在重复 -> 到处都是重复代码
+- 没有想到边界场景 -> 运行时错误
+- 没有想到未来维护者 -> 代码难以阅读
+
+这些指南帮助你在编码前**提出正确的问题**。
+
+---
+
+## 可用指南
+
+| 指南 | 目的 | 何时使用 |
 |-------|---------|-------------|
-| [Code Reuse Thinking Guide](./code-reuse-thinking-guide.md) | Identify patterns and reduce duplication | When you notice repeated patterns |
-| [Cross-Layer Thinking Guide](./cross-layer-thinking-guide.md) | Think through data flow across layers | Features spanning multiple layers |
+| [代码复用思考指南](./code-reuse-thinking-guide.md) | 识别模式并减少重复 | 当你发现重复模式时 |
+| [跨层思考指南](./cross-layer-thinking-guide.md) | 梳理跨层数据流 | 涉及多个层的功能 |
 
 ---
 
-## Quick Reference: Thinking Triggers
+## 快速参考：思考触发点
 
-### When to Think About Cross-Layer Issues
+### 何时思考跨层问题
 
-- [ ] Feature touches 3+ layers (API, Service, Component, Database)
-- [ ] Data format changes between layers
-- [ ] Multiple consumers need the same data
-- [ ] You're not sure where to put some logic
+- [ ] 功能触及 3 个以上层（API、Service、Component、Database）
+- [ ] 数据格式在层之间发生变化
+- [ ] 多个消费方需要同一份数据
+- [ ] 你不确定某段逻辑应该放在哪里
 
-→ Read [Cross-Layer Thinking Guide](./cross-layer-thinking-guide.md)
+-> 阅读 [跨层思考指南](./cross-layer-thinking-guide.md)
 
-### When to Think About Code Reuse
+### 何时思考代码复用
 
-- [ ] You're writing similar code to something that exists
-- [ ] You see the same pattern repeated 3+ times
-- [ ] You're adding a new field to multiple places
-- [ ] **You're modifying any constant or config**
-- [ ] **You're creating a new utility/helper function** ← Search first!
+- [ ] 你正在写与现有代码相似的代码
+- [ ] 你看到同一模式重复出现 3 次以上
+- [ ] 你正在向多个位置添加新字段
+- [ ] **你正在修改任何常量或配置**
+- [ ] **你正在创建新的 utility/helper 函数** -> 先搜索！
 
-→ Read [Code Reuse Thinking Guide](./code-reuse-thinking-guide.md)
+-> 阅读 [代码复用思考指南](./code-reuse-thinking-guide.md)
 
 ---
 
-## Pre-Modification Rule (CRITICAL)
+## 修改前规则（关键）
 
-> **Before changing ANY value, ALWAYS search first!**
+> **修改任何值之前，始终先搜索！**
 
 ```bash
 # Search for the value you're about to change
 grep -r "value_to_change" .
 ```
 
-This single habit prevents most "forgot to update X" bugs.
+这个习惯本身就能避免大多数“忘记更新 X”的缺陷。
 
 ---
 
-## How to Use This Directory
+## 如何使用此目录
 
-1. **Before coding**: Skim the relevant thinking guide
-2. **During coding**: If something feels repetitive or complex, check the guides
-3. **After bugs**: Add new insights to the relevant guide (learn from mistakes)
-
----
-
-## Contributing
-
-Found a new "didn't think of that" moment? Add it to the relevant guide.
+1. **编码前**：快速浏览相关思考指南
+2. **编码中**：如果某件事显得重复或复杂，检查这些指南
+3. **缺陷后**：把新的洞察补充到相关指南中（从错误中学习）
 
 ---
 
-**Core Principle**: 30 minutes of thinking saves 3 hours of debugging.
+## 贡献
+
+发现新的“没有想到这一点”的时刻？把它添加到相关指南中。
+
+---
+
+**核心原则**：30 分钟思考，节省 3 小时调试。

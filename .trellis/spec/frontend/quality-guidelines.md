@@ -1,57 +1,57 @@
-# Quality Guidelines
+# 质量指南
 
-> Frontend quality standards and review checks.
-
----
-
-## Overview
-
-Frontend changes must preserve multi-tenant isolation assumptions, mini-program constraints, and cool-admin-vue conventions. Prefer small, verifiable changes over broad abstractions.
+> 前端质量标准与评审检查。
 
 ---
 
-## Forbidden Patterns
+## 概览
 
-- Direct `uni.request`, `uni.uploadFile`, or `uni.downloadFile` in business pages/components without the shared tenant/auth header wrapper.
-- C-end business code manually setting `X-Tenant-Id`, passing arbitrary tenant ids, or mutating `tenantStore`.
-- Unbucketed cart state such as `CartItem[]` without `Record<tenantId, CartItem[]>`.
-- Runtime hot-plugin claims or implementations for the C-end mini-program. C-end plugin features must be build-time uni subpackages.
-- Using uni-app x, Vue 2, Vuex, axios-in-mini-program, or abandoned UI libraries unless a later PRD explicitly revises the stack.
-- Admin hard-coded role/menu/permission branching that bypasses backend `permmenu`.
-- Browser-only DOM, `window`, `document`, `localStorage`, Node APIs, or unsupported CSS assumptions in C-end code.
+前端变更必须保持 multi-tenant isolation assumptions、mini-program constraints 和 cool-admin-vue conventions。优先做小而可验证的变更，而不是宽泛抽象。
 
 ---
 
-## Required Patterns
+## 禁止模式
 
-- C-end uses uni-app Vue 3 + Vite + TypeScript + wot-design-uni + Pinia.
-- C-end MVP targets only WeChat mini-program (`MP-WEIXIN`).
-- Every C-end business request injects `X-Tenant-Id` from read-only tenant state.
-- Admin uses cool-admin-vue 8.x and builds with `VITE_BRAND=merchant|platform`.
-- Admin menu, permission, and route visibility are backend-driven.
-- Plugin admin pages may be compiled into the admin bundle and activated by backend menu/config; C-end plugin pages are static subpackages selected by build.
-
----
-
-## Testing Requirements
-
-Once frontend code exists:
-
-- Run the relevant lint and typecheck commands before reporting done.
-- For C-end request/store work, add unit tests around tenant header injection and cart bucket operations where the project test stack supports it.
-- For admin brand work, verify both `merchant` and `platform` builds or at least the mode-specific config resolution.
-- For mini-program UI flows, run the WeChat mini-program build command and inspect generated output for missing pages/subpackages.
-
-Documentation-only spec updates must at least run a readback check for placeholders and required hard-rule phrases.
+- 在 business pages/components 中直接使用 `uni.request`、`uni.uploadFile` 或 `uni.downloadFile`，而不通过共享 tenant/auth header wrapper。
+- C-end business code 手动设置 `X-Tenant-Id`、传入任意 tenant ids，或修改 `tenantStore`。
+- 未按租户分桶的 cart state，例如没有 `Record<tenantId, CartItem[]>` 的 `CartItem[]`。
+- 对 C-end mini-program 声称或实现 runtime hot-plugin。C-end plugin features 必须是 build-time uni subpackages。
+- 使用 uni-app x、Vue 2、Vuex、axios-in-mini-program 或 abandoned UI libraries，除非后续 PRD 明确修订技术栈。
+- Admin 硬编码 role/menu/permission branching，绕过后端 `permmenu`。
+- 在 C-end code 中使用 browser-only DOM、`window`、`document`、`localStorage`、Node APIs 或不受支持的 CSS assumptions。
 
 ---
 
-## Code Review Checklist
+## 必需模式
 
-- Is tenant context initialized once from `VITE_TENANT_ID` and then read-only?
-- Do all C-end request paths, including upload/download, apply tenant and auth headers?
-- Is cart data bucketed by tenant id and mode-aware for rent/sale?
-- Does the C-end change avoid H5/App assumptions during MVP?
-- Does admin visibility come from backend menu/perms rather than frontend-only role checks?
-- Are plugin claims accurate for the target surface: admin compiled routes vs C-end build-time subpackages?
-- Are types explicit enough to prevent rent/sale and tenant-id mixups?
+- C-end 使用 uni-app Vue 3 + Vite + TypeScript + wot-design-uni + Pinia。
+- C-end MVP 只面向 WeChat mini-program（`MP-WEIXIN`）。
+- 每个 C 端业务请求从只读租户状态注入 `X-Tenant-Id`。
+- Admin 使用 cool-admin-vue 8.x，并通过 `VITE_BRAND=merchant|platform` 构建。
+- Admin menu、permission 和 route visibility 由后端驱动。
+- Plugin admin pages 可以编译进 admin bundle，并由后端 menu/config 激活；C-end plugin pages 是 build 选择的静态 subpackages。
+
+---
+
+## 测试要求
+
+前端代码存在后：
+
+- 报告完成前运行相关 lint 和 typecheck commands。
+- 对 C-end request/store work，在项目测试栈支持时添加 tenant header injection 和 cart bucket operations 的 unit tests。
+- 对 admin brand work，验证 `merchant` 和 `platform` 两种 builds，或至少验证 mode-specific config resolution。
+- 对 mini-program UI flows，运行 WeChat mini-program build command，并检查生成输出是否缺少 pages/subpackages。
+
+文档类 spec updates 至少必须运行 readback check，确认 placeholders 和 required hard-rule phrases。
+
+---
+
+## 代码评审清单
+
+- Tenant context 是否从 `VITE_TENANT_ID` 初始化一次，随后只读？
+- 所有 C-end request paths（包括 upload/download）是否应用 tenant 和 auth headers？
+- Cart data 是否按 tenant id 分桶，并对 rent/sale mode-aware？
+- C-end change 是否避免了 MVP 阶段的 H5/App assumptions？
+- Admin 可见性是否来自后端 menu/perms，而不是纯前端角色检查？
+- Plugin claims 是否符合目标端面：admin compiled routes vs C-end build-time subpackages？
+- Types 是否足够显式，能防止 rent/sale 和 tenant-id 混淆？

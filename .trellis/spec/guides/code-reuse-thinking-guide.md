@@ -1,23 +1,24 @@
-# Code Reuse Thinking Guide
+# 代码复用思考指南
 
-> **Purpose**: Stop and think before creating new code - does it already exist?
-
----
-
-## The Problem
-
-**Duplicated code is the #1 source of inconsistency bugs.**
-
-When you copy-paste or rewrite existing logic:
-- Bug fixes don't propagate
-- Behavior diverges over time
-- Codebase becomes harder to understand
+> **目的**：在创建新代码前停下来想一想：它是否已经存在？
 
 ---
 
-## Before Writing New Code
+## 问题
 
-### Step 1: Search First
+**重复代码是造成一致性缺陷的首要来源。**
+
+当你复制粘贴或重写已有逻辑时：
+
+- 缺陷修复不会传播
+- 行为会随着时间分叉
+- 代码库会变得更难理解
+
+---
+
+## 编写新代码前
+
+### 第 1 步：先搜索
 
 ```bash
 # Search for similar function names
@@ -27,79 +28,82 @@ grep -r "functionName" .
 grep -r "keyword" .
 ```
 
-### Step 2: Ask These Questions
+### 第 2 步：提出这些问题
 
-| Question | If Yes... |
+| 问题 | 如果是... |
 |----------|-----------|
-| Does a similar function exist? | Use or extend it |
-| Is this pattern used elsewhere? | Follow the existing pattern |
-| Could this be a shared utility? | Create it in the right place |
-| Am I copying code from another file? | **STOP** - extract to shared |
+| 是否存在相似函数？ | 使用或扩展它 |
+| 此模式是否在其他地方使用？ | 遵循现有模式 |
+| 这是否可以成为共享 utility？ | 在正确位置创建它 |
+| 我是否正在从另一个文件复制代码？ | **停止** - 抽取为共享代码 |
 
 ---
 
-## Common Duplication Patterns
+## 常见重复模式
 
-### Pattern 1: Copy-Paste Functions
+### 模式 1：复制粘贴函数
 
-**Bad**: Copying a validation function to another file
+**坏例子**：把验证函数复制到另一个文件
 
-**Good**: Extract to shared utilities, import where needed
+**好例子**：抽取到共享 utilities，需要时导入
 
-### Pattern 2: Similar Components
+### 模式 2：相似组件
 
-**Bad**: Creating a new component that's 80% similar to existing
+**坏例子**：创建一个与现有组件 80% 相似的新组件
 
-**Good**: Extend existing component with props/variants
+**好例子**：用 props/variants 扩展现有组件
 
-### Pattern 3: Repeated Constants
+### 模式 3：重复常量
 
-**Bad**: Defining the same constant in multiple files
+**坏例子**：在多个文件中定义同一个常量
 
-**Good**: Single source of truth, import everywhere
-
----
-
-## When to Abstract
-
-**Abstract when**:
-- Same code appears 3+ times
-- Logic is complex enough to have bugs
-- Multiple people might need this
-
-**Don't abstract when**:
-- Only used once
-- Trivial one-liner
-- Abstraction would be more complex than duplication
+**好例子**：单一事实来源，到处导入
 
 ---
 
-## After Batch Modifications
+## 何时抽象
 
-When you've made similar changes to multiple files:
+**在以下情况抽象**：
 
-1. **Review**: Did you catch all instances?
-2. **Search**: Run grep to find any missed
-3. **Consider**: Should this be abstracted?
+- 相同代码出现 3 次以上
+- 逻辑复杂到可能产生缺陷
+- 多个人可能需要它
 
----
+**在以下情况不要抽象**：
 
-## Gotcha: Asymmetric Mechanisms Producing Same Output
-
-**Problem**: When two different mechanisms must produce the same file set (e.g., recursive directory copy for init vs. manual `files.set()` for update), structural changes (renaming, moving, adding subdirectories) only propagate through the automatic mechanism. The manual one silently drifts.
-
-**Symptom**: Init works perfectly, but update creates files at wrong paths or misses files entirely.
-
-**Prevention checklist**:
-- [ ] When migrating directory structures, search for ALL code paths that reference the old structure
-- [ ] If one path is auto-derived (glob/copy) and another is manually listed, the manual one needs updating
-- [ ] Add a regression test that compares outputs from both mechanisms
+- 只使用一次
+- 微不足道的一行代码
+- 抽象会比重复更复杂
 
 ---
 
-## Checklist Before Commit
+## 批量修改后
 
-- [ ] Searched for existing similar code
-- [ ] No copy-pasted logic that should be shared
-- [ ] Constants defined in one place
-- [ ] Similar patterns follow same structure
+当你对多个文件做了相似修改：
+
+1. **Review**：是否覆盖了所有实例？
+2. **Search**：运行 grep 查找遗漏
+3. **Consider**：是否应该抽象？
+
+---
+
+## 易错点：不对称机制生成相同输出
+
+**问题**：当两套不同机制必须生成同一组文件（例如 init 使用递归目录复制，而 update 使用手动 `files.set()`）时，结构变更（重命名、移动、添加子目录）只会通过自动机制传播。手动机制会悄悄漂移。
+
+**症状**：Init 工作完全正常，但 update 会在错误路径创建文件，或完全漏掉文件。
+
+**预防清单**：
+
+- [ ] 迁移目录结构时，搜索所有引用旧结构的代码路径
+- [ ] 如果一条路径自动派生（glob/copy），另一条路径手动列出，手动路径也需要更新
+- [ ] 添加回归测试，对比两套机制的输出
+
+---
+
+## 提交前清单
+
+- [ ] 已搜索现有相似代码
+- [ ] 没有应当共享的复制粘贴逻辑
+- [ ] 常量只在一个位置定义
+- [ ] 相似模式遵循同一结构

@@ -1,8 +1,8 @@
-# Research: 支付与资金流方案（多租户租售电商）
+# 研究：支付与资金流方案（多租户租售电商）
 
-- **Query**: 货款分账（规避二清）、押金托管、租金计费的支付方案；给出 MVP 推荐 + 备选
-- **Scope**: external（微信支付官方能力）+ mixed（结合 cool-admin/Midway/TypeORM 技术栈）
-- **Date**: 2026-07-07
+- **查询**: 货款分账（规避二清）、押金托管、租金计费的支付方案；给出 MVP 推荐 + 备选
+- **范围**: external（微信支付官方能力）+ mixed（结合 cool-admin/Midway/TypeORM 技术栈）
+- **日期**: 2026-07-07
 
 > 注：微信支付官方文档站（pay.weixin.qq.com/wiki、/docs）大量页面为前端 SPA 渲染，curl 直接抓取只能拿到 438KB 的 JS 壳（含 "JSAPI/分账/小程序" 关键词但正文需浏览器执行）。下文结论来自对微信支付 v3 API、电商收付通、分账、预付费/保证金产品规则的领域知识整理；接入前请以商户平台最新文档为准（资质与费率会变动）。
 
@@ -185,7 +185,7 @@ ProfitSharingBill  (分账账单)
 
 ---
 
-## External References
+## 外部参考
 
 - 微信支付 v3 文档首页：https://pay.weixin.qq/docs/merchant/apis/index.html （SPA，浏览器查看）
 - 小程序 JSAPI 支付：https://pay.weixin.qq/docs/merchant/apis/mini-program/mini-prepay.html
@@ -195,7 +195,7 @@ ProfitSharingBill  (分账账单)
 - 微信支付分（先享后付/免押）：https://pay.weixin.qq/docs/merchant/apis/wechat-pay-score/
 - 委托扣款/周期扣款（租金自动续费）：https://pay.weixin.qq/docs/merchant/apis/entrust-payment/
 
-## Caveats / Not Found
+## 注意事项 / 未找到
 
 - ⚠️ 微信官方文档为前端渲染 SPA，本研究的具体接口字段/费率/资质细则**未能在抓取中逐字核实**，落地实现时务必以商户平台最新文档为准（产品名、字段名、费率、签约门槛会变动）
 - ⚠️ **费率**未列：服务商分账费率、电商收付通手续费、预付费/委托扣款的额外费率需在签约时确认，影响成本核算

@@ -7,6 +7,7 @@ export default {
     port: Number(process.env.PORT || 8001),
   },
   asyncContextManager: {
+    // 租户上下文依赖异步链路透传，请勿在默认配置中关闭。
     enable: true,
   },
   staticFile: {

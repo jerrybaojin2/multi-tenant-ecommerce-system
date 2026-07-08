@@ -16,6 +16,7 @@ test('midway version guard accepts v3 and v4 ranges', () => {
 });
 
 test('backend architecture guard accepts self-built Midway backend markers', async () => {
+  // 守卫关注自建 Midway 的必要标记，而不是完整业务实现。
   const root = await createBackendCandidate({
     midwayVersion: '^3.20.3',
     dependencies: {},
@@ -74,6 +75,7 @@ test('production config guard requires synchronize false and dev metadata false'
 });
 
 test('production config guard only accepts dev metadata flag under appMeta', () => {
+  // 防止把其他配置块里的同名字段误当成生产元信息保护。
   const result = checkProdConfigText(`
     export default {
       typeorm: { dataSource: { default: { synchronize: false } } },

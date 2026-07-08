@@ -1,36 +1,36 @@
-# Logging Guidelines
+# 日志指南
 
-> How logging is done in this project.
-
----
-
-## Overview
-
-Use Midway logger facilities, not `console.log`, for backend code. Logs must make tenant isolation, payment callbacks, order/rental state transitions, and scheduled jobs traceable without exposing secrets or personal data.
+> 本项目如何记录日志。
 
 ---
 
-## Log Levels
+## 概览
 
-- `debug`: Local development details and temporary diagnostics. Do not rely on debug logs for production operations.
-- `info`: Important business events that completed successfully, such as payment callback accepted, rental returned, tenant feature enabled, scheduled job summary.
-- `warn`: Expected but abnormal conditions, such as duplicate callback, provider retry, feature disabled for a requested tenant, stale state transition attempt.
-- `error`: Unexpected exceptions, provider hard failures, transaction rollback after all retries, tenant isolation violation attempts, schedule tenant failure.
+后端代码使用 Midway logger facilities，而不是 `console.log`。日志必须让 tenant isolation、payment callbacks、order/rental state transitions 和 scheduled jobs 可追踪，同时不暴露 secrets 或 personal data。
 
 ---
 
-## Structured Logging
+## 日志级别
 
-Prefer structured objects or consistently formatted key/value fields. Include the fields that make the event searchable:
+- `debug`：本地开发细节和临时诊断。不要依赖 debug 日志做生产运维。
+- `info`：已成功完成的重要业务事件，例如 payment callback accepted、rental returned、tenant feature enabled、scheduled job summary。
+- `warn`：预期内但异常的情况，例如 duplicate callback、provider retry、请求 tenant 的 feature disabled、stale state transition attempt。
+- `error`：意外异常、provider hard failures、所有重试后的 transaction rollback、tenant isolation violation attempts、schedule tenant failure。
 
-- `requestId` or trace id when available.
-- `tenantId` for tenant-scoped work.
-- `userId` / `adminUserId` / `consumerId` when relevant and safe.
-- `module`, `service`, `operation`.
-- Domain identifiers such as `orderId`, `orderNo`, `rentalId`, `paymentId`, `outTradeNo`, `transactionId`, `featureKey`.
-- Provider identifiers such as request id, callback id, `sub_mchid`, channel merchant id.
+---
 
-Example:
+## 结构化日志
+
+优先使用结构化对象或格式一致的 key/value fields。包含能让事件被搜索到的字段：
+
+- 可用时包含 `requestId` 或 trace id。
+- tenant-scoped work 包含 `tenantId`。
+- 相关且安全时包含 `userId` / `adminUserId` / `consumerId`。
+- `module`、`service`、`operation`。
+- Domain identifiers，例如 `orderId`、`orderNo`、`rentalId`、`paymentId`、`outTradeNo`、`transactionId`、`featureKey`。
+- Provider identifiers，例如 request id、callback id、`sub_mchid`、channel merchant id。
+
+示例：
 
 ```ts
 this.logger.info('payment callback processed', {
@@ -45,36 +45,36 @@ this.logger.info('payment callback processed', {
 
 ---
 
-## What To Log
+## 记录什么
 
-- Authentication/authorization failures at warn level when they indicate tenant or role misuse.
-- Platform-only operations with actor, reason, and filters.
-- Payment webhook receipt, signature result, tenant resolution, idempotency decision, and final state.
-- Order/rental state transitions: previous status, next status, actor, event id.
-- Deposit/funds ledger writes: ledger type, amount in minor units, idempotency key, related event.
-- Scheduled job start/end summaries and per-tenant failures.
-- Feature enable/disable/config changes.
-
----
-
-## What Not To Log
-
-Never log:
-
-- JWTs, refresh tokens, session ids, passwords, API keys, private keys, certificates, provider secret keys.
-- Full payment provider callback bodies if they include personal or sensitive fields.
-- Full addresses, phone numbers, id card data, bank cards, or openid/unionid unless masked and operationally necessary.
-- Raw SQL containing user data.
-- Cross-tenant record payloads while debugging tenant issues.
-
-Mask sensitive values at the source before logging. Do not rely on downstream log processors to clean secrets.
+- 当 authentication/authorization failures 表明 tenant 或 role misuse 时，以 warn 级别记录。
+- 平台专属操作记录 actor、reason 和 filters。
+- Payment webhook receipt、signature result、tenant resolution、idempotency decision 和 final state。
+- Order/rental state transitions：previous status、next status、actor、event id。
+- Deposit/funds ledger writes：ledger type、minor units 的 amount、idempotency key、related event。
+- Scheduled job start/end summaries 和 per-tenant failures。
+- Feature enable/disable/config changes。
 
 ---
 
-## Review Checklist
+## 不记录什么
 
-- [ ] No `console.log` remains in backend code.
-- [ ] Errors include enough context to debug without exposing secrets.
-- [ ] Payment and funds logs use minor units and idempotency keys.
-- [ ] Tenant-scoped logs include `tenantId`.
-- [ ] Platform-only cross-tenant operations log actor and reason.
+绝不要记录：
+
+- JWTs、refresh tokens、session ids、passwords、API keys、private keys、certificates、provider secret keys。
+- 包含 personal 或 sensitive fields 的完整 payment provider callback bodies。
+- 完整 addresses、phone numbers、id card data、bank cards，或未脱敏且非运营必要的 openid/unionid。
+- 包含 user data 的 Raw SQL。
+- 调试 tenant issues 时的 cross-tenant record payloads。
+
+在日志源头就对 sensitive values 做 mask。不要依赖下游 log processors 清理 secrets。
+
+---
+
+## 评审清单
+
+- [ ] 后端代码中没有遗留 `console.log`。
+- [ ] Errors 包含足够 debug 的上下文，同时不暴露 secrets。
+- [ ] Payment 和 funds logs 使用 minor units 和 idempotency keys。
+- [ ] Tenant-scoped logs 包含 `tenantId`。
+- [ ] 平台专属的跨租户操作记录 actor 和 reason。

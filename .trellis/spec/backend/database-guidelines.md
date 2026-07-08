@@ -1,34 +1,34 @@
-# Database Guidelines
+# 数据库指南
 
-> Database patterns and conventions for this project.
-
----
-
-## Overview
-
-Use PostgreSQL for the self-built Midway.js backend. The primary tenancy model is a shared database with a tenant column on every tenant-owned table. App-layer tenant scoping is mandatory, and PostgreSQL RLS is the preferred defense-in-depth layer once migrations exist.
-
-The database contract is safety-first:
-
-- Tenant-scoped tables contain `tenant_id` and matching application-level `tenantId`.
-- Tenant context is resolved from trusted auth/request context once, then consumed by repository/client helpers.
-- Business code must not accept `tenantId` from request bodies for writes.
-- PostgreSQL RLS should fail closed for tenant-owned tables.
-- Raw SQL bypasses helper-level safeguards and is forbidden unless explicitly reviewed.
-- Production never uses schema auto-sync.
+> 本项目的数据库模式与约定。
 
 ---
 
-## Entity And Table Rules
+## 概览
 
-- Every tenant-owned business table must include `tenant_id`.
-- Platform/global configuration tables may be tenantless only when documented and guarded by platform-only services.
-- Plugin-like feature tables that store tenant data must also include `tenant_id`.
-- Prefer explicit comments on monetary/status columns so admin tooling and generated docs are understandable.
-- Store flexible rental pricing rules in PostgreSQL `jsonb` only when the structure is intentionally variable; keep query-critical fields as typed columns.
-- Use PostgreSQL ranges/exclusion constraints for rental availability where practical.
+自建 Midway.js 后端使用 PostgreSQL。主要租户模型是 shared database，并在每个 tenant-owned table 上包含 tenant column。App-layer tenant scoping 是强制要求；迁移具备后，PostgreSQL RLS 是首选 defense-in-depth 层。
 
-Minimum tenant-scoped shape:
+数据库契约以安全优先：
+
+- Tenant-scoped tables 包含 `tenant_id` 和匹配的 application-level `tenantId`。
+- Tenant context 从可信 auth/request context 解析一次，然后由 repository/client helpers 使用。
+- 业务代码不得从 request bodies 接受 `tenantId` 用于 writes。
+- PostgreSQL RLS 应对 tenant-owned tables 默认拒绝。
+- Raw SQL 会绕过 helper-level safeguards，除非经过明确 review，否则禁止使用。
+- Production 永不使用 schema auto-sync。
+
+---
+
+## Entity 与 Table 规则
+
+- 每个 tenant-owned business table 必须包含 `tenant_id`。
+- Platform/global configuration tables 只有在有文档说明并由 platform-only services 保护时，才可以不含 tenant。
+- 存储 tenant data 的 plugin-like feature tables 也必须包含 `tenant_id`。
+- 对 monetary/status columns 优先添加显式 comments，让 admin tooling 和 generated docs 易于理解。
+- 只有当结构有意可变时，才把 flexible rental pricing rules 存入 PostgreSQL `jsonb`；查询关键字段应保持 typed columns。
+- 实用时，对 rental availability 使用 PostgreSQL ranges/exclusion constraints。
+
+最小 tenant-scoped shape：
 
 ```ts
 export interface TenantScopedRow {
@@ -39,116 +39,95 @@ export interface TenantScopedRow {
 }
 ```
 
-Physical columns should be snake_case (`tenant_id`, `created_at`); TypeScript properties should be camelCase (`tenantId`, `createdAt`).
+物理列应使用 snake_case（`tenant_id`、`created_at`）；TypeScript properties 应使用 camelCase（`tenantId`、`createdAt`）。
 
 ---
 
-## Query Patterns
+## Query 模式
 
-Use one approved data-access path per request:
+每个请求使用一条已批准的 data-access path：
 
-- A tenant-aware repository/client helper that reads tenant context from `core/tenant`.
-- Explicit transaction helpers for order, rental, payment, deposit, and inventory workflows.
-- Platform-only repository methods for cross-tenant reads, protected by platform role guards.
+- 从 `core/tenant` 读取 tenant context 的 tenant-aware repository/client helper。
+- 面向 order、rental、payment、deposit 和 inventory workflows 的显式 transaction helpers。
+- 面向 cross-tenant reads 的 platform-only repository methods，并由 platform role guards 保护。
 
-Forbidden by default:
+默认禁止：
 
 - `repository.query(...)`
 - `dataSource.query(...)`
 - string-built SQL
-- direct global DB client use in request-scoped business services
-- accepting `tenantId` from client input for tenant-owned writes
+- 在 request-scoped business services 中直接使用 global DB client
+- 对 tenant-owned writes 接受来自 client input 的 `tenantId`
 
-Exceptions require all of the following:
+例外必须同时满足：
 
-- The operation is platform-only or otherwise genuinely cross-tenant.
-- The method lives in a platform service or approved infrastructure helper.
-- The method name or comment states why tenant filtering is intentionally bypassed.
-- Tests prove merchant/app users cannot reach the path.
+- 操作是 platform-only，或确实是 genuinely cross-tenant。
+- 方法位于 platform service 或已批准的 infrastructure helper 中。
+- 方法名或注释说明为什么有意绕过 tenant filtering。
+- 测试证明 merchant/app users 无法访问该路径。
 
-## Scenario: PR0 Tenant Query Guard Contract
+## 场景：PR0 Tenant Query Guard 契约
 
-### 1. Scope / Trigger
+### 1. 范围 / 触发
 
-- Trigger: PR0 establishes the first executable tenant-isolation contract before
-  full repository helpers and migrations exist.
-- Scope: TypeORM `QueryBuilder` paths used by tenant-scoped reads and writes.
-- Important boundary: `afterSelectQueryBuilder`, `afterInsertQueryBuilder`,
-  `afterUpdateQueryBuilder`, and `afterDeleteQueryBuilder` are project-owned
-  guard method names. They are not part of TypeORM's standard
-  `EntitySubscriberInterface`, so do not assume TypeORM calls them
-  automatically.
+- 触发：PR0 在完整 repository helpers 和 migrations 存在前，建立第一个可执行 tenant-isolation contract。
+- 范围：tenant-scoped reads 和 writes 使用的 TypeORM `QueryBuilder` paths。
+- 重要边界：`afterSelectQueryBuilder`、`afterInsertQueryBuilder`、`afterUpdateQueryBuilder` 和 `afterDeleteQueryBuilder` 是项目自有的 guard method names。它们不是 TypeORM 标准 `EntitySubscriberInterface` 的一部分，因此不要假设 TypeORM 会自动调用它们。
 
-### 2. Signatures
+### 2. 签名
 
-- Guard class: `TenantSubscriber`
-- Fixture class: `TenantSubscriberForTest`
-- Query guard methods:
+- Guard class：`TenantSubscriber`
+- Fixture class：`TenantSubscriberForTest`
+- Query guard methods：
   - `afterSelectQueryBuilder(queryBuilder: SelectQueryBuilder<unknown>): void`
   - `afterInsertQueryBuilder(queryBuilder: InsertQueryBuilder<unknown>): void`
   - `afterUpdateQueryBuilder(queryBuilder: UpdateQueryBuilder<unknown>): void`
   - `afterDeleteQueryBuilder(queryBuilder: DeleteQueryBuilder<unknown>): void`
-- Tenant context helpers:
+- Tenant context helpers：
   - `getTenantContext(): TenantContext | undefined`
   - `requireTenantId(): string`
   - `isPlatformContext(): boolean`
 
-### 3. Contracts
+### 3. 契约
 
-- Environment keys:
-  - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` for local runtime.
-  - `TEST_DB_HOST`, `TEST_DB_PORT`, `TEST_DB_USER`, `TEST_DB_PASSWORD`,
-    `TEST_DB_NAME` for real PostgreSQL tests.
-- Default database names:
-  - Runtime dev database: `rent_dev`
-  - Real integration-test database: `rent_test`
-- Guard behavior:
-  - Merchant/consumer select adds a tenant predicate for the active tenant id.
-  - Merchant/consumer insert overwrites client-supplied `tenantId` with the
-    active tenant id.
-  - Merchant/consumer update/delete adds a tenant predicate.
-  - Platform context intentionally does not add a tenant predicate; platform
-    service and role guards must protect that path.
+- Environment keys：
+  - `DB_HOST`、`DB_PORT`、`DB_USER`、`DB_PASSWORD`、`DB_NAME` 用于 local runtime。
+  - `TEST_DB_HOST`、`TEST_DB_PORT`、`TEST_DB_USER`、`TEST_DB_PASSWORD`、`TEST_DB_NAME` 用于真实 PostgreSQL tests。
+- 默认数据库名称：
+  - Runtime dev database：`rent_dev`
+  - Real integration-test database：`rent_test`
+- Guard behavior：
+  - Merchant/consumer select 会为 active tenant id 添加 tenant predicate。
+  - Merchant/consumer insert 会用 active tenant id 覆盖 client-supplied `tenantId`。
+  - Merchant/consumer update/delete 会添加 tenant predicate。
+  - Platform context 有意不添加 tenant predicate；platform service 和 role guards 必须保护该路径。
 
-### 4. Validation & Error Matrix
+### 4. 验证与错误矩阵
 
-- Missing tenant context for tenant-scoped write -> throw before writing.
-- Merchant tries to forge `tenantId` on insert -> persisted row uses current
-  tenant id.
-- Merchant tries to update/delete another tenant's row -> affected count is `0`.
-- PostgreSQL unavailable during root tests -> real tenant tests skip with an
-  explicit startup hint, while pure isolation tests still run.
-- Production config has `synchronize:true` -> `guard:prod-config` fails.
-- Production config lacks `appMeta.exposeDevMetadata:false` ->
-  `guard:prod-config` fails.
+- tenant-scoped write 缺少 tenant context -> 写入前抛错。
+- Merchant 尝试在 insert 中伪造 `tenantId` -> persisted row 使用 current tenant id。
+- Merchant 尝试 update/delete 另一个 tenant 的 row -> affected count 为 `0`。
+- root tests 期间 PostgreSQL 不可用 -> real tenant tests 带明确 startup hint 跳过，而 pure isolation tests 仍运行。
+- Production config 存在 `synchronize:true` -> `guard:prod-config` 失败。
+- Production config 缺少 `appMeta.exposeDevMetadata:false` -> `guard:prod-config` 失败。
 
-### 5. Good/Base/Bad Cases
+### 5. 正例、基线与反例
 
-- Good: service/repository helper reads tenant id from `tenant-context`, applies
-  the query guard, and never trusts a request body tenant field.
-- Base: root `tests/tenant-isolation.test.mjs` validates isolation semantics
-  without a database.
-- Bad: implementing `EntitySubscriberInterface` only to expose custom
-  `after*QueryBuilder` methods; TypeORM does not define those methods, and the
-  build should not pretend they are automatically invoked.
-- Bad: adding `TenantSubscriber` to TypeORM `dataSource.subscribers`; TypeORM
-  will try to instantiate it as a real subscriber even though the project guard
-  methods are not TypeORM lifecycle hooks.
+- 正例：service/repository helper 从 `tenant-context` 读取 tenant id，应用 query guard，并且永不信任 request body tenant field。
+- 基线：root `tests/tenant-isolation.test.mjs` 在无数据库情况下验证 isolation semantics。
+- 反例：只为暴露自定义 `after*QueryBuilder` methods 而实现 `EntitySubscriberInterface`；TypeORM 并未定义这些 methods，build 不应假装它们会自动调用。
+- 反例：把 `TenantSubscriber` 添加到 TypeORM `dataSource.subscribers`；TypeORM 会尝试把它实例化为真实 subscriber，但项目 guard methods 不是 TypeORM lifecycle hooks。
 
-### 6. Tests Required
+### 6. 必需测试
 
-- Root architecture guard must reject backend packages with `@cool-midway/*`
-  runtime dependencies.
-- Root production config guard must assert `synchronize:false` and
-  `appMeta.exposeDevMetadata:false`.
-- Pure isolation tests must cover list, get, create, update, and delete
-  tenant boundaries.
-- Real PostgreSQL tests must cover select scoping, insert tenant override,
-  update/delete write scoping, and platform cross-tenant read behavior.
+- Root architecture guard 必须拒绝带 `@cool-midway/*` runtime dependencies 的 backend packages。
+- Root production config guard 必须断言 `synchronize:false` 和 `appMeta.exposeDevMetadata:false`。
+- Pure isolation tests 必须覆盖 list、get、create、update 和 delete tenant boundaries。
+- Real PostgreSQL tests 必须覆盖 select scoping、insert tenant override、update/delete write scoping，以及 platform cross-tenant read behavior。
 
-### 7. Wrong vs Correct
+### 7. 错误 vs 正确
 
-#### Wrong
+#### 错误
 
 ```ts
 export class TenantSubscriber implements EntitySubscriberInterface {
@@ -158,10 +137,9 @@ export class TenantSubscriber implements EntitySubscriberInterface {
 }
 ```
 
-This claims a TypeORM interface contract that does not contain the project
-guard methods.
+这声称了一个并不包含项目 guard methods 的 TypeORM interface contract。
 
-#### Correct
+#### 正确
 
 ```ts
 export class TenantSubscriber {
@@ -171,67 +149,66 @@ export class TenantSubscriber {
 }
 ```
 
-Treat these methods as project-owned guard hooks until a tenant-aware
-repository/helper wraps and calls them explicitly.
+在 tenant-aware repository/helper 显式包装并调用这些 methods 之前，把它们视为项目自有 guard hooks。
 
 ---
 
-## Tenant Context Rules
+## 租户上下文规则
 
-- Admin requests get tenant context from the verified admin JWT.
-- C-end app requests get tenant context from the app token and/or trusted tenant header after validation.
-- Payment webhooks have no user JWT. Resolve tenant from trusted provider fields, for example `sub_mchid` or channel merchant id, then execute updates with explicit tenant context.
-- Scheduled jobs have no request context. Iterate eligible tenants and run one tenant's work per isolated context.
-- Platform operators may run cross-tenant queries only through platform-role-guarded services.
-
----
-
-## RLS Guidance
-
-Adopt PostgreSQL RLS for tenant-owned tables after the migration system is in place:
-
-- Use an app role that is not table owner, not superuser, and has no `BYPASSRLS`.
-- Set tenant context per transaction with `set_config('app.tenant_id', tenantId, true)`.
-- Add `USING` and `WITH CHECK` policies so read/write both fail closed.
-- Use `FORCE ROW LEVEL SECURITY` where appropriate.
-- Platform maintenance jobs should use explicit platform roles or controlled bypass paths, never ordinary merchant request connections.
-
-RLS does not replace app-layer scoping; it is the database backstop for missed filters and future raw-query mistakes.
+- Admin requests 从已验证的 admin JWT 获取 tenant context。
+- C-end app requests 从 app token 和/或验证后的可信 tenant header 获取 tenant context。
+- Payment webhooks 没有 user JWT。从可信 provider fields 解析 tenant，例如 `sub_mchid` 或 channel merchant id，然后用显式 tenant context 执行 updates。
+- Scheduled jobs 没有 request context。迭代 eligible tenants，并在隔离 context 中运行单个 tenant 的 work。
+- Platform operators 只能通过 platform-role-guarded services 执行 cross-tenant queries。
 
 ---
 
-## Transactions And State
+## RLS 指南
 
-- Use transactions for order creation, payment callback handling, rental status transitions, inventory reservation, deposit ledger updates, and profit sharing state.
-- State transitions must be idempotent. Use stable keys such as payment transaction id, out trade no, rental event id, or provider callback id.
-- For concurrent order/rental/funds transitions, lock the aggregate row or use a clear optimistic locking/idempotency strategy.
-- Do not write financial side effects directly inside controllers. Controllers call services; services emit/handle events and persist ledgers.
+迁移系统到位后，对 tenant-owned tables 采用 PostgreSQL RLS：
 
----
+- 使用不是 table owner、不是 superuser、且没有 `BYPASSRLS` 的 app role。
+- 每个 transaction 使用 `set_config('app.tenant_id', tenantId, true)` 设置 tenant context。
+- 添加 `USING` 和 `WITH CHECK` policies，使 read/write 都默认拒绝越权访问。
+- 适当使用 `FORCE ROW LEVEL SECURITY`。
+- Platform maintenance jobs 应使用显式 platform roles 或受控 bypass paths，绝不使用普通 merchant request connections。
 
-## Migrations And Schema Changes
-
-- PRs that add or change tables must include migrations once the backend skeleton exists.
-- Never rely on ORM auto-sync to mutate production schemas.
-- Prefer service-level integrity checks over ad hoc foreign-key-free conventions. Use database constraints where they protect money, stock, or rental availability.
-- Index tenant-scoped high-volume lookup columns with tenant context, for example tenant + status, tenant + order no, tenant + created time.
+RLS 不替代应用层 scoping；它是针对漏掉 filters 和未来 raw-query mistakes 的数据库兜底。
 
 ---
 
-## Naming Conventions
+## 事务与状态
 
-- Use stable, descriptive table names; avoid future product renames in table names.
-- Keep TypeScript property names camelCase and physical columns snake_case.
-- Monetary values use integer minor units unless a provider requires a different convention.
-- Status columns use string constants/enums; do not store display labels.
+- 对 order creation、payment callback handling、rental status transitions、inventory reservation、deposit ledger updates 和 profit sharing state 使用 transactions。
+- 状态流转必须 idempotent。使用稳定 keys，例如 payment transaction id、out trade no、rental event id 或 provider callback id。
+- 对 concurrent order/rental/funds transitions，锁定 aggregate row，或使用清晰的 optimistic locking/idempotency strategy。
+- 不要在 controllers 中直接写 financial side effects。Controllers 调用 services；services emit/handle events 并持久化 ledgers。
 
 ---
 
-## Common Mistakes
+## 迁移与数据库结构变更
 
-- Treating `tenant_id` as a field the frontend can choose.
-- Using a global DB client inside services and forgetting tenant context.
-- Writing raw SQL and silently leaking data across tenants.
-- Running scheduled jobs without tenant context.
-- Handling payment callbacks with no tenant resolution.
-- Leaving schema auto-sync enabled in production.
+- 添加或修改 tables 的 PR，在 backend skeleton 存在后必须包含 migrations。
+- 永远不要依赖 ORM auto-sync 变更 production schemas。
+- 优先使用 service-level integrity checks，而不是临时的 foreign-key-free conventions。在它们能保护 money、stock 或 rental availability 时使用 database constraints。
+- 以 tenant context 索引 tenant-scoped high-volume lookup columns，例如 tenant + status、tenant + order no、tenant + created time。
+
+---
+
+## 命名约定
+
+- 使用稳定、描述性的 table names；避免在 table names 中使用未来可能变化的产品命名。
+- TypeScript property names 保持 camelCase，物理列保持 snake_case。
+- Monetary values 使用 integer minor units，除非 provider 要求不同约定。
+- Status columns 使用 string constants/enums；不要存储 display labels。
+
+---
+
+## 常见错误
+
+- 把 `tenant_id` 当作 frontend 可以选择的字段。
+- 在 services 内使用 global DB client，并忘记 tenant context。
+- 编写 raw SQL，静默泄漏跨租户数据。
+- 在没有 tenant context 的情况下运行 scheduled jobs。
+- 处理 payment callbacks 时没有 tenant resolution。
+- Production 中仍启用 schema auto-sync。

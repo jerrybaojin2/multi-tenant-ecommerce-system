@@ -1,14 +1,14 @@
-# Type Safety
+# 类型安全
 
-> TypeScript and validation patterns for frontend work.
+> 前端工作的 TypeScript 与验证模式。
 
 ---
 
-## Overview
+## 概览
 
-Use TypeScript strictly. Prefer domain-specific types over loose records because tenant, order mode, and payment/deposit fields are easy to mix up.
+严格使用 TypeScript。优先使用 domain-specific types，而不是宽松 records，因为 tenant、order mode 和 payment/deposit fields 很容易混淆。
 
-Recommended compiler posture once frontend code exists:
+前端代码存在后，推荐 compiler posture：
 
 ```json
 {
@@ -22,14 +22,14 @@ Recommended compiler posture once frontend code exists:
 
 ---
 
-## Type Organization
+## 类型组织
 
-- Shared domain types live under `src/types/` when consumed by multiple modules.
-- Single-module types may be colocated as `*.types.ts`.
-- API request/response contracts live beside the API client or in a generated/contract folder if backend generation is introduced later.
-- Do not share admin-only types with C-end mini-program code unless they are true domain contracts.
+- 被多个 modules 使用的 shared domain types 放在 `src/types/` 下。
+- 单一 module 使用的 types 可以与代码共置为 `*.types.ts`。
+- API request/response contracts 放在 API client 旁边；如果之后引入 backend generation，也可以放在 generated/contract folder 中。
+- 不要把 admin-only types 与 C-end mini-program code 共享，除非它们是真正的 domain contracts。
 
-Core domain primitives should be explicit:
+核心 domain primitives 应保持显式：
 
 ```ts
 type TenantId = string
@@ -37,13 +37,13 @@ type OrderMode = 'rent' | 'sale'
 type Brand = 'merchant' | 'platform'
 ```
 
-Use these consistently in stores, API params, and component props.
+在 stores、API params 和 component props 中一致使用这些类型。
 
 ---
 
-## API Contracts
+## API 契约
 
-Use a consistent response envelope:
+使用一致的 response envelope：
 
 ```ts
 type ApiResult<T> = {
@@ -53,13 +53,13 @@ type ApiResult<T> = {
 }
 ```
 
-Rules:
+规则：
 
-- API clients return typed `data`, not `unknown` blobs.
-- Request params must not accept arbitrary tenant ids for normal C-end business calls; tenant id comes from the request wrapper.
-- Represent rent/sale branching with discriminated unions when fields differ.
+- API clients 返回 typed `data`，不是 `unknown` blobs。
+- Request params 在普通 C-end business calls 中不得接受任意 tenant ids；tenant id 来自 request wrapper。
+- 当 rent/sale 分支字段不同时，使用 discriminated unions 表达。
 
-Example:
+示例：
 
 ```ts
 type CartItem =
@@ -85,19 +85,19 @@ type CartItem =
 
 ---
 
-## Validation
+## 验证
 
-- Validate startup tenant configuration before the first business request.
-- Treat backend responses as untrusted at boundaries where the shape affects payment, deposit, or tenant-sensitive behavior.
-- If a runtime validation library is introduced, keep schemas near API contracts and infer TypeScript types from schemas.
-- For admin backend-driven menus, validate required fields such as route path, permission code, and `viewPath` before dynamic route registration.
+- 在第一个业务请求前验证启动阶段的租户配置。
+- 在 shape 会影响 payment、deposit 或 tenant-sensitive behavior 的边界处，把 backend responses 视为不可信。
+- 如果引入 runtime validation library，让 schemas 靠近 API contracts，并从 schemas 推断 TypeScript types。
+- 对 admin backend-driven menus，在 dynamic route registration 前验证 required fields，例如 route path、permission code 和 `viewPath`。
 
 ---
 
-## Forbidden Patterns
+## 禁止模式
 
-- `any` for API responses, store state, component props, or route/menu contracts.
-- Broad type assertions such as `as CartItem` to hide missing rent/sale fields.
-- Stringly typed order modes, brands, permission keys, or tenant ids scattered through templates.
-- Optional tenant id in request config for business APIs when tenant id is mandatory.
-- Mixing deposit, rent amount, and goods amount under a generic `amount` field in frontend contracts.
+- 在 API responses、store state、component props 或 route/menu contracts 中使用 `any`。
+- 使用宽泛 type assertions（例如 `as CartItem`）掩盖缺失的 rent/sale fields。
+- 在 templates 中到处分散 stringly typed order modes、brands、permission keys 或 tenant ids。
+- 当 business APIs 必须有 tenant id 时，在 request config 中把 tenant id 设为 optional。
+- 在 frontend contracts 中把 deposit、rent amount 和 goods amount 混在一个通用 `amount` 字段下。

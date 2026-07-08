@@ -25,6 +25,7 @@ export class DemoResourceService {
   async createForTenant(
     input: CreateDemoResourceDto
   ): Promise<DemoResourceEntity> {
+    // 创建时只信任上下文租户，忽略请求体中可能夹带的 tenantId。
     const tenantId = requireTenantId();
     const name = input.name?.trim();
     if (!name) {
@@ -44,6 +45,7 @@ export class DemoResourceService {
 
   async listForPlatform(): Promise<DemoResourceEntity[]> {
     if (!isPlatformContext()) {
+      // 跨租户列表只开放给平台态，避免商户借平台接口越权读取。
       throw new BusinessError(
         'PLATFORM_ONLY',
         'Platform role is required for cross-tenant demo resources',

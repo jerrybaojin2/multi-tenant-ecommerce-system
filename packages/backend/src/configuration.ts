@@ -43,6 +43,7 @@ export class MainConfiguration {
   logger: ILogger;
 
   async onReady() {
+    // Midway 组件导入完成后再挂载，确保每个请求先进入租户上下文。
     this.app.useMiddleware(['tenant'] as any);
     this.logger.info('[backend] self-built Midway.js backend ready');
   }

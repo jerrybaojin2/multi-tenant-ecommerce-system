@@ -1,10 +1,10 @@
 # 多租户电商系统 (Multi-Tenant E-commerce System)
 
-## Goal
+## 目标
 
 构建一个多租户「租售结合」SaaS 平台：后端采用 **自研 Midway.js 主后端（Midway 3.x + PostgreSQL）**，自行实现租户上下文、RBAC、订单、租赁履约、资金台账、支付通道与审计能力；C 端使用 uni-app 微信小程序；B+平台 admin 使用独立 Web 管理端（Next.js 或 Vue，PR1 定版）。支持多商家入驻，同一商品既能出租也能售卖，并保证数据隔离。
 
-## Decision (ADR-lite)
+## 决策（ADR-lite）
 
 **D1 — 业务模式**：**租售结合**。商品同时承载租赁属性（押金/租期/JSONB 计费规则）与零售属性；订单支持租买混单。
 
@@ -33,7 +33,7 @@
 
 **D10 — 仓库结构**：**单仓 monorepo（pnpm workspace）**。根目录 `packages/{backend, app-c, admin}`：backend=自研 Midway.js 主后端、app-c=uni-app Vue3 C 端、admin=独立管理端（Next.js/Vue 待 PR1 定版）。统一依赖/CI/脚本/版本。
 
-## Technical Approach
+## 技术方案
 
 - **后端**：自研 Midway.js 3.x + PostgreSQL
   - 租户上下文：JWT/请求头解析 tenant → Midway middleware/guard → `tenant-context` helper → tenant-aware repository/client
@@ -53,7 +53,7 @@
 - ⚠️ **C 端微信小程序无运行时热插**（微信禁运行时下载 JS）→ C 端扩展只能 uni 分包 + 构建期纳入。
 - ⚠️ **支付合规**：平台 ICP/EDI、微信/支付宝服务商进件、跨境收款开户与数据出境合规属 P0/P1 blocker。
 
-## Research 已完成
+## 研究已完成
 
 - [`research/payment-funds.md`](research/payment-funds.md) — 境内微信：服务商分账+预付费押金；二清合规；回调反查 tenant
 - [`research/payment-cross-border.md`](research/payment-cross-border.md) — 多通道 Strategy 抽象；境内支付宝；境外默认收款/结汇；押金强制境内路由
@@ -64,7 +64,7 @@
 - [`research/backend-framework.md`](research/backend-framework.md) / [`research/backend-orm-db.md`](research/backend-orm-db.md) — 历史选型研究；当前确认自研 Midway.js 主后端，并保留 PostgreSQL/RLS 的安全结论
 - [`research/cool-admin-multi-tenant.md`](research/cool-admin-multi-tenant.md) / [`research/plugin-architecture.md`](research/plugin-architecture.md) — 历史参考，不再作为目标架构
 
-## Open Questions
+## 未决问题
 
 - PR1 前定版 admin 技术栈：Next.js 还是 Vue。
 - PR1/PR2 前定版 ORM/迁移方案：继续 TypeORM，还是切 Drizzle/Prisma。当前 PR0 仅保留 TypeORM subscriber 骨架用于隔离验证。
@@ -91,7 +91,7 @@
 
 并行波次：A 串行骨架(PR0-2) → B/C 三路并行(PR3/4) → 后续按依赖。
 
-## Requirements (evolving)
+## 需求（持续演进）
 
 - 后端自研 Midway.js 3.x；前端 uni-app Vue3（C 端）+ 独立管理端（B/平台端）
 - 多租户多商家入驻，共享 PostgreSQL + tenant_id + tenant context + RLS 兜底
@@ -100,7 +100,7 @@
 - **MVP = 租售并行完整**，C 端仅微信小程序
 - 消息通知：MVP 用微信小程序订阅消息（支付成功 / 发货 / 租赁到期）
 
-## Acceptance Criteria (evolving)
+## 验收标准（持续演进）
 
 - [ ] 多租户隔离经自动化测试验证（A 租户绝不可访问 B 租户数据）
 - [ ] 原生 SQL 绕过被 lint/审查规则拦截
@@ -111,14 +111,14 @@
 - [ ] 支付通道/业务扩展可通过模块化 Strategy 接入，后台可配置启停
 - [ ] 生产环境 schema auto-sync 与开发元数据/调试端点已关闭
 
-## Definition of Done
+## 完成定义
 
 - 测试覆盖核心域（租售订单双状态机、押金资金台账、租户隔离、支付通道）
 - Lint / typecheck / 构建通过；CI 锁关键风险
 - 多租户隔离 + 支付/扩展 Strategy 有自动化测试守护
 - spec 文档更新
 
-## Out of Scope (MVP)
+## MVP 范围外
 
 - H5 / App 端（二期）
 - 第三方聚合支付
@@ -127,7 +127,7 @@
 - 跨商家全局用户识别（D9 预留字段，MVP 不实现）
 - PostgreSQL RLS 全量上线（PR2 准备，业务表落地后逐步开启）
 
-## Technical Notes
+## 技术备注
 
 - greenfield 仓库；项目名 miniAppRentPlatfrom（小程序租赁平台）
 - Midway.js 文档：https://midwayjs.org/

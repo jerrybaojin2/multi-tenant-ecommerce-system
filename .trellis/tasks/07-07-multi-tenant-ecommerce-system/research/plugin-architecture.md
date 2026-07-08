@@ -1,8 +1,8 @@
-# Research: Plugin Architecture for Multi-Tenant Rental+Retail SaaS
+# 研究：多租户租售 SaaS 的插件架构
 
-- **Query**: 设计一套插件架构，参考 cool-admin/node 插件系统，落地到 NestJS + Drizzle ORM + PostgreSQL(RLS 多租户) + uni-app Vue3 技术栈
-- **Scope**: mixed（外部：cool-admin 文档与 NestJS/前端最佳实践；内部：本项目待落地实现）
-- **Date**: 2026-07-07
+- **查询**: 设计一套插件架构，参考 cool-admin/node 插件系统，落地到 NestJS + Drizzle ORM + PostgreSQL(RLS 多租户) + uni-app Vue3 技术栈
+- **范围**: mixed（外部：cool-admin 文档与 NestJS/前端最佳实践；内部：本项目待落地实现）
+- **日期**: 2026-07-07
 
 ---
 
@@ -254,7 +254,7 @@ class CouponService {
 
 | 层 | 方案 | 说明 |
 |---|---|---|
-| **菜单** | 后端 `GET /api/plugins/menus`（按当前租户启用的插件聚合）→ 前端动态注入路由表 | 后端是 single source of truth，避免前端硬编码 |
+| **菜单** | 后端 `GET /api/plugins/menus`（按当前租户启用的插件聚合）→ 前端动态注入路由表 | 后端是单一事实来源，避免前端硬编码 |
 | **路由** | `router.addRoute()` 在登录后动态注册 | Vue Router 原生支持 |
 | **页面组件** | **Vite 的动态 import + 代码分割**（MVP）；规模大时升级 **Module Federation** | 见下权衡 |
 
@@ -369,7 +369,7 @@ export interface PluginLifecycle {
 
 ---
 
-## Caveats / Not Found
+## 注意事项 / 未找到
 
 - cool-admin 的 `core/module.md` / `core/tenant.md` / `core/eps.md` 三个补充页面本次 curl 返回 **404**（VitePress 的真实 URL 由 hash map 决定，路径带 hash）；但其 `plugin.html` 主文档已包含足够机制说明，不影响结论。
 - 未在本仓库内做内部代码搜索（当前任务是 greenfield 架构设计，仓库尚无 NestJS/Drizzle 实现可供检索）。落地实现后建议补一份 `internal/` 扫描，对照本契约校验。

@@ -9,6 +9,7 @@ export interface TenantContext {
   requestId?: string;
 }
 
+// 每个请求独立保存租户信息，避免并发请求之间串租户。
 const tenantStorage = new AsyncLocalStorage<TenantContext>();
 
 export function runWithTenantContext<T>(
@@ -33,6 +34,7 @@ export function requireTenantContext(): TenantContext {
 export function requireTenantId(): string {
   const context = requireTenantContext();
   if (!context.tenantId || context.role === 'platform') {
+    // 平台态不允许伪装成租户态执行写入或租户级查询。
     throw new Error('Tenant id is required for tenant-scoped operation');
   }
   return context.tenantId;

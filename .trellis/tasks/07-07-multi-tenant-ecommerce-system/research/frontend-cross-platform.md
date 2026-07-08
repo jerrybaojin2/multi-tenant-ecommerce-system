@@ -1,8 +1,8 @@
-# Research: 跨平台端取舍 + 前端架构细化（多租户租售电商）
+# 研究：跨平台端取舍 + 前端架构细化（多租户租售电商）
 
-- **Query**: 跨平台目标端（MVP 是否只微信小程序 / H5 / App 何时进）；C 端 uni 架构细化（目录、请求层 X-Tenant-Id 拦截器、多租户购物车分桶、租/买双入口、租赁/归还交互）；B/平台 admin 双品牌构建、菜单/权限按角色+租户隔离、插件动态加载；C 端小程序插件分包纳入。
-- **Scope**: mixed（external：cool-admin-vue 8.x 源码实证 + uni-app 官方机制；internal：基于已定 PRD 与 frontend-uni-stack.md）
-- **Date**: 2026-07-07
+- **查询**: 跨平台目标端（MVP 是否只微信小程序 / H5 / App 何时进）；C 端 uni 架构细化（目录、请求层 X-Tenant-Id 拦截器、多租户购物车分桶、租/买双入口、租赁/归还交互）；B/平台 admin 双品牌构建、菜单/权限按角色+租户隔离、插件动态加载；C 端小程序插件分包纳入。
+- **范围**: mixed（external：cool-admin-vue 8.x 源码实证 + uni-app 官方机制；internal：基于已定 PRD 与 frontend-uni-stack.md）
+- **日期**: 2026-07-07
 - **数据来源**:
   - GitHub `cool-team-official/cool-admin-vue` 仓库（默认分支 `8.x`，2431★，2025-12-17 仍维护；package.json version=8.0.0）——**直接读 8.x 分支源码**作为实证（非凭文档记忆）。
   - 前序研究 `research/frontend-uni-stack.md`（uni 栈结论）+ `research/cool-admin-multi-tenant.md` + `research/plugin-architecture.md`。
@@ -10,7 +10,7 @@
 
 ---
 
-## TL;DR — 决策与推荐
+## 摘要 — 决策与推荐
 
 | 议题 | 推荐 | 一句话理由 |
 |---|---|---|
@@ -174,7 +174,7 @@ type CartState = {
 
 租赁履约是本项目相对标准电商的**最大差异点**，MP 交互要点：
 
-1. **押金透明化**：下单页**单独高亮押金金额**与"归还时按规则退还"说明；支付页拆分「押金 + 租金/货款」两笔，符合微信支付对资金类型的合规要求（与 PRD Open Question "支付与资金流"强相关，需后端配合分账）。
+1. **押金透明化**：下单页**单独高亮押金金额**与"归还时按规则退还"说明；支付页拆分「押金 + 租金/货款」两笔，符合微信支付对资金类型的合规要求（与 PRD 未决问题「支付与资金流」强相关，需后端配合分账）。
 2. **租期可视化**：订单详情用**时间轴/日历组件**展示「起租日 → 到期日 → 今日」，倒计时组件（wot-design-uni 有 CountDown）提示"距到期 X 天"。
 3. **归还入口**：
    - 到期前 N 天（订阅消息推送）→ 订单详情出现「申请续租 / 申请归还」CTA。
@@ -279,7 +279,7 @@ src/plugins/<plugin-name>/
 **动态加载的三条路径（按场景）**：
 
 1. **编译期纳入（默认，MVP 用这条）**：插件源码放 `src/plugins/`，`import.meta.glob` 编译期扫描 → `config.ts` 的 `views/pages` 注册路由 + 组件。**无运行时下载**，是静态打包。后端"安装插件"操作 → 后端表记录 → 重新构建前端产物部署。
-2. **后端菜单驱动 `viewPath`**：后端给某角色菜单时，菜单项 `viewPath` 指向 `cool/<plugin-name>/views/xxx.vue`，`router.append`（源码 line 100）按 `files['/src/'+viewPath.replace('cool/','')]` 找组件动态 `addRoute`。**关键 caveat**：`router/index.ts:19` 的 glob **只扫了 `modules/*`，没扫 `plugins/*`**，所以 `files` 字典里**没有插件 view**。**本项目必须把 glob 补成 `['/src/modules/*/{views,pages}/**/*', '/src/plugins/*/{views,pages}/**/*']`**，否则后端下发的插件菜单 viewPath 找不到组件、跳 404。
+2. **后端菜单驱动 `viewPath`**：后端给某角色菜单时，菜单项 `viewPath` 指向 `cool/<plugin-name>/views/xxx.vue`，`router.append`（源码 line 100）按 `files['/src/'+viewPath.replace('cool/','')]` 找组件动态 `addRoute`。**关键注意点**：`router/index.ts:19` 的 glob **只扫了 `modules/*`，没扫 `plugins/*`**，所以 `files` 字典里**没有插件 view**。**本项目必须把 glob 补成 `['/src/modules/*/{views,pages}/**/*', '/src/plugins/*/{views,pages}/**/*']`**，否则后端下发的插件菜单 viewPath 找不到组件、跳 404。
 3. **`config.ts` 显式 `views/pages`**：插件自己 `views: [{path, component: () => import('./views/x.vue')}]`，`createModule` 阶段注册。不依赖后端菜单，适合插件自带固定入口页（如插件设置页）。
 
 **"热插拔"如实标注**：
@@ -395,14 +395,14 @@ src/plugins/<plugin-name>/
 
 ---
 
-## 7. Caveats / 风险与未决项
+## 7. 注意事项 / 风险与未决项
 
 1. **路由 glob 未覆盖 plugins（实证坑）**：`src/cool/router/index.ts:19` 的 `import.meta.glob` 只扫 `modules/*`，后端菜单下发的插件 `viewPath`（`cool/<plugin>/views/...`）会找不到组件 → 404。**本项目须把 glob 扩到 `plugins/*`**，否则 admin 插件页面加载不通。
 2. **前端 tenant header 只是哨兵**：服务端 TypeORM Subscriber + tenant_id 过滤才是安全边界（PRD D3 + frontend-uni-stack.md §8.4 已强调）。前端 `X-Tenant-Id` 注入是"方便 + 快速发现 bug"，**不可作为防越权**。
 3. **C 端"插件"非即时生效**：商家在 admin 启用 C 端功能 → 需该商家小程序重新构建发版（MP 禁运行时下载）。**运营话术和文档必须如实标注**，避免给商家"即时生效"的错觉。详见 §4。
 4. **租/买混合结算的复杂度**：MVP 建议**单次结算仅同 mode 同 tenantId**（§2.4），避免一个订单同时含租+买导致状态机混乱。混合单作为后续优化。
-5. **押金资金流依赖后端**：C 端押金展示/退还 UI 已规划，但实际资金分账（平台代收 vs 微信电商分账 vs 沙箱模拟）依赖 PRD Open Question「支付与资金流」定夺，前端需据后端方案调整支付页结构。
-6. **归还履约方式待定**：物流/自提/到店归还的 UI 差异较大，依赖 PRD Open Question「履约方式」。到店扫码核销（`uni.scanCode`）是 MP 体验最佳路径，建议优先。
+5. **押金资金流依赖后端**：C 端押金展示/退还 UI 已规划，但实际资金分账（平台代收 vs 微信电商分账 vs 沙箱模拟）依赖 PRD 未决问题「支付与资金流」定夺，前端需据后端方案调整支付页结构。
+6. **归还履约方式待定**：物流/自提/到店归还的 UI 差异较大，依赖 PRD 未决问题「履约方式」。到店扫码核销（`uni.scanCode`）是 MP 体验最佳路径，建议优先。
 7. **未实证的 admin 文档页**：cool-admin 官方文档站（cool-admin.com 多个路径 404，show.cool-admin.com 是 demo 壳）在本次抓取中不稳定，**所有 admin 机制结论均来自直接读 `cool-admin-vue` 8.x 源码**（比文档更权威）。若需官方文档原话佐证，建议在稳定网络下重抓 `cool-admin-midway-docs` 仓库的 markdown 源。
 8. **双品牌构建的 `enable` 字段**：平台/商家独有模块用 `config.ts` 的 `enable: brand==='xxx'` 控制。注意 `bootstrap/module.ts:81` 是 `if (e.enable !== false)` 才 `install` —— 设 `enable:false` 可整模块跳过，但**模块的 `config.ts` 仍会被 glob 扫描并 import**（只是不 install），其副作用（如顶层 import）仍执行；写模块时顶层不要放副作用代码。
 9. **eps（endpoint service）依赖 `@cool-vue/vite-plugin`**：`virtual:eps`（`bootstrap/eps.ts:4`）由 vite 插件从后端 `/base/open/eps` 拉取并注入。**生产关闭 `cool.eps`（PRD 约束）会影响此机制**——需确认关闭路径是仅关后端 eps 暴露、不影响前端构建期 eps 注入；或改用其他 service 定义方式。**待与后端 cool-admin v8 eps 生产策略对齐**。

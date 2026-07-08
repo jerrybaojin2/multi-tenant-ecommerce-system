@@ -1,67 +1,67 @@
-# Hook Guidelines
+# Composable 指南
 
-> How composables and stateful helpers are used.
-
----
-
-## Overview
-
-Use Vue composables for reusable frontend logic. Name them `useXxx` and keep them framework-appropriate:
-
-- C-end composables may call uni APIs and Pinia stores.
-- Admin composables may use cool-admin-vue services, router, and permission helpers.
-- Shared pure logic should be a typed utility instead of a composable.
+> Composables 和有状态 helpers 如何使用。
 
 ---
 
-## Custom Composable Patterns
+## 概览
 
-Good candidates:
+使用 Vue composables 复用前端逻辑。命名为 `useXxx`，并保持框架适配：
 
-- `useTenantRequest` for request preconditions, status, and normalized errors.
-- `useRentBuyMode` for local product detail mode switching.
-- `useRentalTimeline` for deriving rental progress display state.
-- `useSubscribeMessage` for mini-program subscription-message authorization.
-
-Rules:
-
-- Return refs/computed values and explicit actions.
-- Keep side effects visible in action names such as `load`, `submit`, `authorize`.
-- Do not perform tenant initialization in arbitrary composables; only startup/bootstrap code initializes tenant state.
-- Do not make composables global state containers when a Pinia store is the correct owner.
+- C-end composables 可以调用 uni APIs 和 Pinia stores。
+- Admin composables 可以使用 cool-admin-vue services、router 和 permission helpers。
+- Shared pure logic 应是 typed utility，而不是 composable。
 
 ---
 
-## Data Fetching
+## 自定义 Composable 模式
 
-C-end:
+适合的候选：
 
-- All business network calls go through the project request wrapper over `uni.request`.
-- The request wrapper injects `X-Tenant-Id` from `tenantStore` and auth token from `authStore`.
-- Upload and download helpers must reuse the same tenant/auth header preparation.
-- 401 is handled by auth flow; 403 is treated as a tenant/permission sentinel and should be surfaced/reportable.
+- `useTenantRequest`：处理 request preconditions、status 和 normalized errors。
+- `useRentBuyMode`：处理本地 product detail mode switching。
+- `useRentalTimeline`：派生 rental progress display state。
+- `useSubscribeMessage`：处理 mini-program subscription-message authorization。
 
-Admin:
+规则：
 
-- Use cool-admin-vue service/eps conventions where available.
-- Menus and permissions are loaded from backend `permmenu` and drive route/menu rendering.
-- Do not bypass backend permission and tenant checks with frontend-only filters.
-
-Server state should generally be reloaded on page entry or action completion. Add caching only when the invalidation rule is obvious.
-
----
-
-## Naming Conventions
-
-- `useTenant*` is reserved for tenant-aware helpers and must never expose a setter for tenant id to business code.
-- `useCart*` works with current-tenant buckets via the cart store.
-- `useAdmin*` helpers are admin-only and must not be imported by C-end code.
-- `useMp*` or `useWeixin*` helpers are mini-program-specific and should remain C-end only.
+- 返回 refs/computed values 和显式 actions。
+- 让 side effects 体现在 action names 中，例如 `load`、`submit`、`authorize`。
+- 不要在任意 composables 中执行租户初始化；只有启动/bootstrap 代码初始化租户状态。
+- 当 Pinia store 才是正确 owner 时，不要把 composables 做成 global state containers。
 
 ---
 
-## Common Mistakes
+## 数据获取
 
-- Do not put `VITE_TENANT_ID` reads throughout the app. Read it in config/startup, initialize `tenantStore`, then consume the store.
-- Do not let API functions accept arbitrary `tenantId` from callers for normal C-end business requests.
-- Do not create a generic cross-platform abstraction for H5/App during PR0/PR1; MVP is WeChat mini-program only.
+C-end：
+
+- 所有 business network calls 都通过项目基于 `uni.request` 的 request wrapper。
+- Request wrapper 从 `tenantStore` 注入 `X-Tenant-Id`，并从 `authStore` 注入 auth token。
+- Upload 和 download helpers 必须复用同一套 tenant/auth header preparation。
+- 401 由 auth flow 处理；403 被视为 tenant/permission sentinel，并应可展示/可上报。
+
+Admin：
+
+- 可用时使用 cool-admin-vue service/eps conventions。
+- Menus 和 permissions 从后端 `permmenu` 加载，并驱动 route/menu rendering。
+- 不要用纯前端 filters 绕过后端权限和 tenant checks。
+
+服务端状态通常应在 page entry 或 action completion 时重新加载。只有 invalidation rule 清楚时才添加 caching。
+
+---
+
+## 命名约定
+
+- `useTenant*` 保留给 tenant-aware helpers，绝不能向 business code 暴露 tenant id setter。
+- `useCart*` 通过 cart store 操作 current-tenant buckets。
+- `useAdmin*` helpers 仅用于 admin，不得被 C-end code 导入。
+- `useMp*` 或 `useWeixin*` helpers 面向 mini-program，应保持 C-end only。
+
+---
+
+## 常见错误
+
+- 不要在整个 app 中到处读取 `VITE_TENANT_ID`。在 config/startup 中读取它，初始化 `tenantStore`，然后消费 store。
+- 不要让 API functions 在普通 C 端业务请求中接受调用方传入的任意 `tenantId`。
+- 不要在 PR0/PR1 创建面向 H5/App 的通用 cross-platform abstraction；MVP 仅为 WeChat mini-program。

@@ -11,6 +11,7 @@ export class TenantMiddleware implements IMiddleware<Context, NextFunction> {
       const role = resolveRole(ctx.path);
       const tenantHeader = ctx.get('x-tenant-id');
       const platformHeader = ctx.get('x-platform-role');
+      // PR0 先用可信请求头承载租户身份，后续接入鉴权后由认证上下文派生。
       const tenantId =
         role === 'platform' || platformHeader === 'true'
           ? undefined
@@ -34,6 +35,7 @@ export class TenantMiddleware implements IMiddleware<Context, NextFunction> {
 }
 
 function resolveRole(path: string): ActorRole {
+  // 路由前缀是当前运行时区分消费端、商户端和平台端的边界。
   if (path.startsWith('/admin/platform')) {
     return 'platform';
   }

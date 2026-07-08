@@ -1,18 +1,18 @@
-# Directory Structure
+# 目录结构
 
-> How backend code is organized in this project.
-
----
-
-## Overview
-
-Follow a self-built Midway.js modular monolith. Business code lives under `src/modules/<domain>/`. Cross-cutting platform primitives live under `src/core/`. Controllers stay thin; domain rules live in services. Persistence code must be tenant-aware by construction.
+> 本项目如何组织后端代码。
 
 ---
 
-## Directory Layout
+## 概览
 
-Recommended backend shape:
+遵循自建 Midway.js modular monolith。业务代码位于 `src/modules/<domain>/`。跨领域的平台基础能力位于 `src/core/`。Controllers 保持 thin；domain rules 放在 services 中。Persistence code 必须天然 tenant-aware。
+
+---
+
+## 目录布局
+
+推荐后端形态：
 
 ```text
 packages/backend/
@@ -85,66 +85,66 @@ packages/backend/
 
 ---
 
-## Module Organization
+## 模块组织
 
-- `core/auth/**`: JWT, current user resolution, password/session helpers, and auth middleware.
-- `core/tenant/**`: tenant context, tenant guard, platform cross-tenant guard, and any AsyncLocalStorage/request-context adapters.
-- `core/database/**`: ORM initialization, tenant-aware repository/client helpers, migrations, and PostgreSQL RLS helpers.
-- `core/permissions/**`: RBAC, menu/permission model, admin route guards, and platform-vs-merchant checks.
-- `modules/platform/**`: platform operator APIs, merchant onboarding, qualification, packages, and cross-tenant views.
-- `modules/merchant/**`: merchant staff APIs and tenant self-service.
-- `modules/consumer/**`: C-end WeChat mini-program APIs. Keep these separate from admin assumptions.
-- `modules/goods/**`: rental + sale product catalog and pricing rules.
-- `modules/inventory/**`: retail stock, rental availability, reservations, and concurrency control.
-- `modules/order/**`: shared order header, order items, order-level transaction state.
-- `modules/rental/**`: rental fulfillment records, rental events, overdue/renew/return/buyout state.
-- `modules/payment/**`: payment orders, provider callback processing, channel routing, and idempotency.
-- `modules/funds/**`: deposit/rent/sale ledgers and settlement side effects.
-- `schedules/**`: Midway scheduled jobs. Jobs with tenant-scoped effects must iterate tenants explicitly and isolate failures.
-- `integrations/**`: provider adapters and protocol-specific code. Keep provider payload models out of domain entities.
-
----
-
-## Controller Layout
-
-- Admin/platform APIs use `/admin/**` routes.
-- Merchant admin APIs use `/admin/merchant/**` routes and require tenant context.
-- Platform operator APIs use `/admin/platform/**` routes and require platform role.
-- C-end mini-program APIs use `/app/consumer/**` routes and app-user auth.
-- Payment and provider callbacks use `/open/**` or provider-specific public routes, but must derive tenant from trusted provider identifiers such as `sub_mchid` or channel merchant id.
+- `core/auth/**`：JWT、current user resolution、password/session helpers 和 auth middleware。
+- `core/tenant/**`：tenant context、tenant guard、platform cross-tenant guard，以及任何 AsyncLocalStorage/request-context adapters。
+- `core/database/**`：ORM initialization、tenant-aware repository/client helpers、migrations 和 PostgreSQL RLS helpers。
+- `core/permissions/**`：RBAC、menu/permission model、admin route guards，以及 platform-vs-merchant checks。
+- `modules/platform/**`：platform operator APIs、merchant onboarding、qualification、packages 和 cross-tenant views。
+- `modules/merchant/**`：merchant staff APIs 和 tenant self-service。
+- `modules/consumer/**`：C-end WeChat mini-program APIs。让它们与 admin assumptions 保持分离。
+- `modules/goods/**`：rental + sale product catalog 和 pricing rules。
+- `modules/inventory/**`：retail stock、rental availability、reservations 和 concurrency control。
+- `modules/order/**`：shared order header、order items、order-level transaction state。
+- `modules/rental/**`：rental fulfillment records、rental events、overdue/renew/return/buyout state。
+- `modules/payment/**`：payment orders、provider callback processing、channel routing 和 idempotency。
+- `modules/funds/**`：deposit/rent/sale ledgers 和 settlement side effects。
+- `schedules/**`：Midway scheduled jobs。带有 tenant-scoped effects 的 jobs 必须显式迭代 tenants 并隔离 failures。
+- `integrations/**`：provider adapters 和 protocol-specific code。不要让 provider payload models 进入 domain entities。
 
 ---
 
-## Middleware Registration
+## Controller 布局
 
-- Middleware classes under `core/**` are not active just because they use `@Middleware()`.
-- Global request middleware must be registered in `src/configuration.ts` with the class `getName()` value, for example `this.app.useMiddleware(['tenant'])`.
-- Registered middleware classes must also be Midway definitions, so use `@Provide('<middleware-name>')` with the same value returned by `getName()`.
-- In the compiled bootstrap path, provider/controller/middleware files must be exported from `src/index.ts` so decorators execute and definitions enter the container.
-- Tenant, auth, request-id, and audit middleware must be registered before controllers depend on their context helpers.
-- When adding a route that calls `requireTenantId()` or `requireTenantContext()`, verify the middleware path can establish context for that route family.
-
----
-
-## Naming Conventions
-
-- Module folders: lowercase kebab-case only when needed; prefer simple lowercase names (`order`, `payment`, `rental`).
-- Entity classes: `PascalCase` with an `Entity` suffix.
-- Entity files: lowercase descriptive names, for example `order.entity.ts`, `order-item.entity.ts`, `rental-event.entity.ts`.
-- DTO files: `<action>.dto.ts` or `<domain>-<action>.dto.ts`.
-- Service files/classes: `<domain>.service.ts` and `DomainService`.
-- Middleware/guards: `<purpose>.middleware.ts`, `<purpose>.guard.ts`.
-- Status codes: string enums/constants stored in one module-level contract, not duplicated in controllers.
+- Admin/platform APIs 使用 `/admin/**` routes。
+- Merchant admin APIs 使用 `/admin/merchant/**` routes，并要求 tenant context。
+- Platform operator APIs 使用 `/admin/platform/**` routes，并要求 platform role。
+- C-end mini-program APIs 使用 `/app/consumer/**` routes 和 app-user auth。
+- Payment 和 provider callbacks 使用 `/open/**` 或 provider-specific public routes，但必须从可信 provider identifiers（例如 `sub_mchid` 或 channel merchant id）派生 tenant。
 
 ---
 
-## Examples To Establish
+## Middleware 注册
 
-PR0/PR1 should create the first canonical examples:
+- `core/**` 下的 Middleware classes 不会仅因为使用 `@Middleware()` 就自动生效。
+- Global request middleware 必须在 `src/configuration.ts` 中用 class `getName()` value 注册，例如 `this.app.useMiddleware(['tenant'])`。
+- 已注册 middleware classes 也必须是 Midway definitions，因此使用 `@Provide('<middleware-name>')`，并与 `getName()` 返回值保持一致。
+- 在 compiled bootstrap path 中，provider/controller/middleware files 必须从 `src/index.ts` 导出，这样 decorators 才会执行并进入 container definitions。
+- Tenant、auth、request-id 和 audit middleware 必须在 controllers 依赖其 context helpers 之前注册。
+- 添加调用 `requireTenantId()` 或 `requireTenantContext()` 的 route 时，验证该 route family 的 middleware path 能建立 context。
 
-- A tenant-scoped entity with a `tenantId` column.
-- A tenant context middleware that resolves tenant from trusted auth/header sources.
-- A tenant-aware repository/client helper used by a demo service.
-- A platform-only service method with an explicit role guard.
-- A C-end controller under `/app/consumer/**`.
-- A scheduled rental overdue scan that iterates tenants explicitly.
+---
+
+## 命名约定
+
+- Module folders：需要时使用 lowercase kebab-case；优先简单 lowercase names（`order`、`payment`、`rental`）。
+- Entity classes：`PascalCase`，带 `Entity` 后缀。
+- Entity files：小写描述性名称，例如 `order.entity.ts`、`order-item.entity.ts`、`rental-event.entity.ts`。
+- DTO files：`<action>.dto.ts` 或 `<domain>-<action>.dto.ts`。
+- Service files/classes：`<domain>.service.ts` 和 `DomainService`。
+- Middleware/guards：`<purpose>.middleware.ts`、`<purpose>.guard.ts`。
+- Status codes：字符串 enums/constants 存放在单一 module-level contract 中，不要在 controllers 中重复。
+
+---
+
+## 需要建立的示例
+
+PR0/PR1 应创建第一批标准示例：
+
+- 一个带 `tenantId` column 的 tenant-scoped entity。
+- 一个从可信 auth/header sources 解析 tenant 的 tenant context middleware。
+- 一个由 demo service 使用的 tenant-aware repository/client helper。
+- 一个带显式 role guard 的 platform-only service method。
+- 一个位于 `/app/consumer/**` 下的 C-end controller。
+- 一个显式迭代 tenants 的 scheduled rental overdue scan。

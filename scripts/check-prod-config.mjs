@@ -40,11 +40,13 @@ export async function checkProdConfigFiles(files = DEFAULT_CONFIGS) {
 }
 
 export function checkProdConfigText(content, label = 'config') {
+  // 去掉注释后再检查，避免示例文字误判为真实生产保护。
   const text = stripComments(content);
   const errors = [];
   const checks = [];
   const synchronizeValues = propertyValues(text, 'synchronize');
   const appMetaConfig = propertyObjectBody(text, 'appMeta');
+  // 只接受 appMeta 下的开关，其他同名字段不能代表生产保护。
   const exposeDevMetadataValues = appMetaConfig
     ? propertyValues(appMetaConfig, 'exposeDevMetadata')
     : [];

@@ -1,12 +1,12 @@
-# Research: 履约方式 + 租售订单状态机设计
+# 研究：履约方式 + 租售订单状态机设计
 
-- **Query**: 研究零售/租赁履约方式 MVP 范围；设计租售订单状态机；论证订单表合/拆；资金与状态联动
-- **Scope**: external（电商/租赁行业通用模式）+ 设计决策（结合本项目 cool-admin/TypeORM/PG 栈与 PRD D1）
-- **Date**: 2026-07-07
+- **查询**: 研究零售/租赁履约方式 MVP 范围；设计租售订单状态机；论证订单表合/拆；资金与状态联动
+- **范围**: external（电商/租赁行业通用模式）+ 设计决策（结合本项目 cool-admin/TypeORM/PG 栈与 PRD D1）
+- **日期**: 2026-07-07
 
 ---
 
-## TL;DR（推荐结论先看）
+## 摘要（推荐结论先看）
 
 | 决策点 | 推荐 | 一句话理由 |
 |---|---|---|
@@ -342,7 +342,7 @@ payment(order_id, channel, paid_amount, deposit_amount, rent_amount, sale_amount
 
 ---
 
-## 6. 待主 agent 决策的 Open Question
+## 6. 待主执行方决策的未决问题
 
 - **[Blocking] 支付通道**：押金「冻结」需要支付通道支持预授权/担保（微信「担保支付」/支付宝「预授权」）。若 MVP 用模拟支付，押金冻结=余额数字记账即可，但生产前必须确认通道能力。这直接决定 §4.2 的实现复杂度。
 - **[Preference] 售后退款范围**：MVP 是否支持「已完成订单的售后退款」？若不支持，`completed → refunded` 边可砍，状态机更简。
@@ -351,7 +351,7 @@ payment(order_id, channel, paid_amount, deposit_amount, rent_amount, sale_amount
 
 ---
 
-## Caveats / Not Found
+## 注意事项 / 未找到
 
 - 本仓库为 greenfield，无既有订单代码可参照，设计基于电商/租赁行业通用模式 + 项目栈约束。
 - cool-admin v8 是否内置事件总线（EventBus）未在已读文档中确认；若内置则直接用，否则用 Midway 自带 `@midwayjs/core` 的事件能力或 NestJS 风格的 EventEmitter（Midway 兼容）。建议在 `00-bootstrap` 任务中核实。

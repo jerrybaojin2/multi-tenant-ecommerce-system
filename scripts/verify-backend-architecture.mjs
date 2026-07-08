@@ -4,6 +4,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
 const REQUIRED_MIDWAY = [3, 0, 0];
+// 架构守卫只允许自建 Midway 运行时，防止重新引入 cool-admin 依赖。
 const FORBIDDEN_DEPENDENCY_PREFIXES = ['@cool-midway/'];
 
 export async function verifyBackendArchitecture(candidatePath = 'packages/backend') {
@@ -29,6 +30,7 @@ export async function verifyBackendArchitecture(candidatePath = 'packages/backen
   }
 
   const requiredFiles = [
+    // 这些文件共同证明后端具备启动入口、租户上下文和生产配置边界。
     'src/index.ts',
     'src/configuration.ts',
     'src/core/tenant/tenant-context.ts',

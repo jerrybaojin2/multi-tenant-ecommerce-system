@@ -1,3 +1,4 @@
+// 统一包导出入口，减少外部调用方直接依赖内部文件路径。
 export * from './configuration';
 export * from './core/tenant/tenant.middleware';
 export * from './modules/consumer/controller/ping.controller';
