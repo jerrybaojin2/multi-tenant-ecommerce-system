@@ -1,0 +1,30 @@
+{
+  "id": "pr1-walking-skeleton",
+  "name": "pr1-walking-skeleton",
+  "title": "PR1 三端 walking skeleton",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P1",
+  "creator": "jerry",
+  "assignee": "jerry",
+  "createdAt": "2026-07-09",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "07-09-pr1-backend",
+    "07-09-pr1-c-frontend",
+    "07-09-pr1-admin-frontend"
+  ],
+  "parent": "07-07-multi-tenant-ecommerce-system",
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

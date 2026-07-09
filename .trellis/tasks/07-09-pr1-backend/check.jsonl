@@ -1,0 +1,3 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "guard 生效矩阵（§4）+ 必需测试（§6 隔离回归）+ 生产守护"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "raw SQL/RLS 守护验收"}
+{"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md", "reason": "PR1 验收标准与跨 PR 守护对照"}

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "租户隔离契约 + PR0 query guard 接线规则（after*QueryBuilder 需 tenant-aware helper 显式调用）+ migration/RLS 指南"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "core/database、modules/<feature>、migrations 目录约定"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "raw SQL 拦截、RLS 默认拒绝、生产守护"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "BusinessError 与错误码约定（缺 tenant context 抛错）"}
+{"file": ".trellis/tasks/07-09-pr1-walking-skeleton/research/orm-stack-selection.md", "reason": "ORM 决策（继续 TypeORM）+ Approach A 落地清单：guard 接线、第一条 migration、seed"}
+{"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md", "reason": "PR1 范围、验收、跨 PR 守护规则（业务流程只在 Midway、tenant_id 必备等）"}

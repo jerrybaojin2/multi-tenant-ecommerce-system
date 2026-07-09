@@ -1,7 +1,7 @@
 {
   "title": "H5 与 Admin 功能点梳理",
   "description": "系统性地梳理二期 H5 前端页面和管理后台（商家端 + 平台端）的功能点，为后续 PR1/PR3-PR9 实现提供清晰的功能范围和验收标准。",
-  "status": "planning",
+  "status": "completed",
   "created_at": "2026-07-08",
   "updated_at": "2026-07-09",
   "type": "brainstorm",
@@ -47,6 +47,21 @@
       "topic": "商城模板",
       "decision": "前端商城支持更换模板，但模板只改变布局、区块、样式和展示 props，功能能力共享同一套实现",
       "rationale": "用户要求参考本地模板方案文档；小程序不能运行时下载新 JS，因此模板切换必须基于已编译 registry 和后端配置 schema"
+    },
+    {
+      "topic": "首页模块动态配置",
+      "decision": "平台维护区块 registry，商家装修自己的首页（每租户独立配置表）；动态性仅限已编译区块的排序/显隐/props，新增区块类型需小程序发版",
+      "rationale": "平台建库+商家装修是多租户 SaaS 主流模式，区分平台能力与租户自定义；受微信小程序不能运行时下载 JS 约束"
+    },
+    {
+      "topic": "首页区块 registry MVP 范围",
+      "decision": "首页 7 个 MVP 区块(search/banner/notice/navGrid/productRecommend/productSection/richText)，二期 3 个(countdownSale/couponCenter/live)；商品详情页 MVP 固定结构不装修；navGrid icon 支持内置图标库 key 和上传 url 双模式；productRecommend 数据源 MVP 仅 manual/new/hot，推荐算法二期",
+      "rationale": "用户确认按推荐方案；装修优先聚焦首页价值最高区域；详情页结构稳定；icon 双模式兼顾一致性与灵活度；推荐算法非 MVP 必须"
+    },
+    {
+      "topic": "Admin 模块优先级与端适配",
+      "decision": "平台端优先级：商家管理>套餐>分账>数据>物流>内容>模板>审计>投诉；Admin MVP 仅 PC 端，移动端适配二期",
+      "rationale": "平台运营以商家入驻与资金闭环为先；MVP 聚焦 PC 后台，移动端适配非必须，二期再加"
     }
   ],
   "deliverables": [

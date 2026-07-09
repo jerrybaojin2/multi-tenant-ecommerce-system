@@ -18,7 +18,9 @@
   "commit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
   "pr_url": null,
   "subtasks": [],
-  "children": [],
+  "children": [
+    "07-09-pr1-walking-skeleton"
+  ],
   "parent": null,
   "relatedFiles": [
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md",
