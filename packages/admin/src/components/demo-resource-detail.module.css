@@ -1,0 +1,39 @@
+.detail {
+  margin: 0;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  max-width: 640px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  border-bottom: 1px solid #edf2f7;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.row dt {
+  margin: 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #486581;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.row dd {
+  margin: 0;
+  padding: 14px 16px;
+  color: #243b53;
+  word-break: break-word;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}

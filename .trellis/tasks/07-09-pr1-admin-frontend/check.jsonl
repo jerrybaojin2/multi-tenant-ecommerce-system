@@ -1,1 +1,6 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "质量检查硬规则：Admin 可见性后端驱动、不在 API routes 承载业务、无 placeholder"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "评审清单 + 禁止模式：不硬编码 role/menu/permission、不在 Next.js API routes 写业务；完成前跑 lint/typecheck、验证 merchant+platform 双 surface"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "校验 menu 动态注册前字段验证(route path/permission code/viewPath)、Brand 类型显式、无 any"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "校验 Admin 菜单/权限后端驱动渲染，无前端 filter 绕过"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "校验 Admin 状态来源(server/URL/backend menu)而非散落 store"}
+{"file": ".trellis/tasks/07-09-pr1-walking-skeleton/prd.md", "reason": "父 PRD 验收：双品牌路由壳、merchant 本租户、platform 跨租户显式服务、菜单后端驱动"}

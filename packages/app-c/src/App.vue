@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onLaunch } from '@dcloudio/uni-app';
-import { initTenantStore } from './stores/tenant';
+import { initTenantStore } from './utils/tenant';
 
 onLaunch(() => {
   initTenantStore();

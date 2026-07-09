@@ -13,3 +13,8 @@ temp/
 .vendor/
 .pnpm-store/
 packages/backend/data/
+
+# build artifacts & lockfiles (repo uses pnpm, not npm)
+.next/
+*.tsbuildinfo
+package-lock.json

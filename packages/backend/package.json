@@ -42,6 +42,9 @@
     "lint": "mwts check",
     "lint:fix": "mwts fix",
     "build": "mwtsc --cleanOutDir",
+    "migration:run": "mwtsc --cleanOutDir && typeorm migration:run -d dist/core/database/data-source.js",
+    "migration:revert": "mwtsc --cleanOutDir && typeorm migration:revert -d dist/core/database/data-source.js",
+    "seed": "mwtsc --cleanOutDir && cross-env NODE_ENV=local node dist/core/database/seed.js",
     "check": "cd ../.. && npm run guard:backend-architecture && npm run guard:prod-config -- packages/backend/src/config/config.prod.ts"
   },
   "bin": "./bootstrap.js",

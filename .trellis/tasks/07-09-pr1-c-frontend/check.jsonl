@@ -1,1 +1,6 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "质量检查硬规则：request wrapper 注入 X-Tenant-Id、tenant state 初始化外只读、无 placeholder 文本"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "评审清单 + 禁止模式：business code 不直接 uni.request、不手设 X-Tenant-Id；完成前跑 lint/typecheck/MP-WEIXIN build 检查输出无缺页"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "校验 tenantStore 只读约束、scene 参数不覆盖 tenantId、cart 按 tenant 分桶（若涉及）"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "校验 API 契约 typed、无 any/as 掩盖、tenant id 不进 request param"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "校验 request wrapper 复用 tenant/auth header；useTenant* 不向 business code 暴露 tenant setter"}
+{"file": ".trellis/tasks/07-09-pr1-walking-skeleton/prd.md", "reason": "父 PRD 验收对齐：三端互通、C 端请求注入已校验租户上下文、guard 生效"}

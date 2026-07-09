@@ -3,8 +3,10 @@ import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { listConsumerDemoResources } from '../../api/demo-resource';
 import { useTenantStore } from '../../stores/tenant';
+import { RequestError } from '../../utils/request';
 import type { DemoResource } from '../../types/demo-resource';
 
+// 租户上下文由 App.vue onLaunch（utils/tenant.ts）初始化；这里只读展示。
 const tenantStore = useTenantStore();
 const loading = ref(false);
 const errorMessage = ref('');
@@ -21,16 +23,18 @@ async function loadResources() {
   try {
     resources.value = await listConsumerDemoResources();
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : '请求失败';
+    errorMessage.value =
+      error instanceof RequestError
+        ? `${error.code}: ${error.message}`
+        : error instanceof Error
+          ? error.message
+          : '请求失败';
   } finally {
     loading.value = false;
   }
 }
 
 onLoad(() => {
-  if (!tenantStore.initialized) {
-    tenantStore.initialize();
-  }
   void loadResources();
 });
 </script>
@@ -51,7 +55,8 @@ onLoad(() => {
     <view v-if="resources.length" class="list">
       <view v-for="item in resources" :key="item.id" class="row">
         <text class="name">{{ item.name }}</text>
-        <text class="meta">{{ item.tenantId }}</text>
+        <text v-if="item.description" class="desc">{{ item.description }}</text>
+        <text class="meta">tenant: {{ item.tenantId }}</text>
       </view>
     </view>
 
@@ -79,6 +84,13 @@ onLoad(() => {
   display: block;
   font-size: 34rpx;
   font-weight: 600;
+}
+
+.desc {
+  display: block;
+  margin-top: 8rpx;
+  color: #334155;
+  font-size: 28rpx;
 }
 
 .tenant,

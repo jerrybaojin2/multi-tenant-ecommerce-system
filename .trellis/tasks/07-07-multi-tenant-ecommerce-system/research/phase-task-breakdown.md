@@ -34,7 +34,7 @@ multi-tenant-ecommerce-system
 - C 端:
   - 包已存在，但还没有真实请求封装。
 - Admin:
-  - 包已存在，技术栈决策仍未定。
+  - 包已存在，技术栈已定：Next.js（独立管理端，业务流程调用自研 Midway.js API，不放入 Next.js API routes）。
 - 横切:
   - Trellis 后端 spec 已更新。
   - 根检查和真实 PostgreSQL 租户测试通过。

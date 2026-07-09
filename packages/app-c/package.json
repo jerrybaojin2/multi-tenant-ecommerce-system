@@ -1,23 +1,28 @@
 {
   "name": "@miniapp-rent/app-c",
-  "version": "0.0.0-pr0",
+  "version": "0.0.0-pr1",
   "private": true,
   "description": "C-end WeChat mini-program (uni-app Vue3 + Vite + TS + wot-design-uni + Pinia). PR1: tenant-aware demo skeleton.",
   "scripts": {
     "check": "node scripts/verify-app-c-skeleton.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:mp-weixin": "uni build -p mp-weixin"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "^3.0.0",
-    "@dcloudio/uni-mp-weixin": "^3.0.0",
+    "@dcloudio/uni-app": "3.0.0-alpha-5020120260706001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5020120260706001",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "wot-design-uni": "^1.6.1"
   },
   "devDependencies": {
-    "@dcloudio/vite-plugin-uni": "^3.0.0",
+    "@dcloudio/types": "3.4.31",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5020120260706001",
+    "miniprogram-api-typings": "^5.0.0",
+    "sass": "^1.101.0",
     "typescript": "^5.8.2",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "vue-tsc": "^3.0.0"
   }
 }

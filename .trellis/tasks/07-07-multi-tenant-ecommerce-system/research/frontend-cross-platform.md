@@ -399,6 +399,8 @@ src/plugins/<plugin-name>/
 
 ## 7. 注意事项 / 风险与未决项
 
+> ⚠️ **更新（2026-07-09）**：本研究基于 cool-admin v8（Vue）前端调研。2026-07-08 架构调整后 admin 已改用 **Next.js + 自研 Midway.js 后端**，cool-admin / eps / vue 相关结论（第 1、7、8、9 条）**作废**。仍有效的约束：第 2 条（tenant header 仅哨兵）、第 3 条（C 端功能需重新构建发版）、第 4 条（租/买混合结算复杂度）。第 5 条「支付与资金流」已在主 PRD **D6/D8** 决策；第 6 条「履约方式」订单模型已在 **D5** 决策（双层状态机），具体归还路径优先级后续在履约 PR 再定。
+
 1. **路由 glob 未覆盖 plugins（实证坑）**：`src/cool/router/index.ts:19` 的 `import.meta.glob` 只扫 `modules/*`，后端菜单下发的插件 `viewPath`（`cool/<plugin>/views/...`）会找不到组件 → 404。**本项目须把 glob 扩到 `plugins/*`**，否则 admin 插件页面加载不通。
 2. **前端 tenant header 只是哨兵**：服务端 TypeORM Subscriber + tenant_id 过滤才是安全边界（PRD D3 + frontend-uni-stack.md §8.4 已强调）。前端 `X-Tenant-Id` 注入是"方便 + 快速发现 bug"，**不可作为防越权**。
 3. **C 端"插件"非即时生效**：商家在 admin 启用 C 端功能 → 需该商家小程序重新构建发版（MP 禁运行时下载）。**运营话术和文档必须如实标注**，避免给商家"即时生效"的错觉。详见 §4。

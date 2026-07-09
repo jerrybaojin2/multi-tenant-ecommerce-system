@@ -56,6 +56,45 @@
   font-weight: 700;
 }
 
+.surface {
+  margin: 0;
+  border: 1px solid #bcccdc;
+  border-radius: 6px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.surface legend {
+  padding: 0 4px;
+  color: #486581;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+}
+
+.direct {
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.direct a {
+  color: #0b69a3;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.direct a:hover {
+  text-decoration: underline;
+}
+
 .note {
   margin: 18px 0 0;
   color: #627d98;

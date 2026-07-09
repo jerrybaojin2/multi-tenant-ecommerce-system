@@ -1,1 +1,9 @@
-{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Admin 硬规则：Next.js + TS；业务流程调 Midway 后端不在 Next.js API routes 实现；菜单/路由/权限后端驱动；merchant/platform 品牌差异在 config/theme/backend menu"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Admin App Router 布局：app/login、app/merchant、app/platform；不在 src/app/api 写业务；.env 设 NEXT_PUBLIC_API_BASE_URL + 本地租户标识"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Admin 状态优先来自 server data/URL params/后端 menu response；仅多视图复用且无法留 URL 时才加 domain store"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "Admin API client 调 Midway 后端；菜单/权限后端加载驱动渲染；不用前端 filter 绕过后端权限"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "ApiResult<T> envelope；backend-driven menu 动态注册前验证 route path/permission code/viewPath；Brand='merchant'|'platform' 显式类型"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "禁止 Admin 硬编码 role/menu/permission branching、禁止在 Next.js API routes 实现业务；完成前跑 lint/typecheck/双 surface 验证"}
+{"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md", "reason": "PR1 Admin 范围与验收：登录壳+路由壳+角色感知菜单占位，接通 merchant/platform demo resource"}
+{"file": ".trellis/tasks/07-08-h5-admin-features/prd.md", "reason": "Admin 技术栈决策来源：Next.js + 自研 Midway API（07-08 PRD）"}
+{"file": ".trellis/tasks/07-09-pr1-walking-skeleton/prd.md", "reason": "父 PRD：PR1 三端 walking skeleton 范围、platform 跨租户走显式服务、角色守护"}

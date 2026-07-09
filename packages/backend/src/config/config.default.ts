@@ -31,6 +31,9 @@ export default {
           '**/modules/**/entity/*.entity{.ts,.js}',
           '**/core/**/entity/*.entity{.ts,.js}',
         ],
+        migrations: ['**/core/database/migrations/*{.ts,.js}'],
+        // 默认不在应用启动时跑 migration；prod 在 config.prod.ts 覆盖为 true。
+        migrationsRun: false,
         synchronize: false,
         logging: false,
       },

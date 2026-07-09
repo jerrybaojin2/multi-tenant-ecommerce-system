@@ -35,6 +35,8 @@
 
 **D11 — C 端商城模板**：**模板可更换，但功能能力必须一致**。模板只负责页面布局、区块顺序、视觉 tokens 和展示属性；商品、购物车、订单、支付、售后等功能只实现一套共享 domain/API/state。微信小程序不能运行时下载新 JS，因此 C 端只能在已编译进包内的模板/区块 registry 中切换；新增模板代码或新区块类型需要重新构建发版。
 
+**D12 — ORM/迁移栈**（2026-07-09 决策，收敛自 PR1 walking-skeleton ADR）：**继续 TypeORM 0.3.x + `@midwayjs/typeorm`**（Midway 官方 ORM 组件，PR0 已投入）。本 PR 内接线 PR0 `TenantSubscriber` guard 使其生效，并落地第一条 migration + seed。**切换触发条件**：PR3 业务表若大量需要 JSONB 灵活计价 / tstzrange 防重订等 PG 专属能力、且 TypeORM 0.3 维护态成瓶颈，则该时点评估切 Drizzle（迁移面可控：4 文件 + config）。详见 `07-09-pr1-walking-skeleton/prd.md` ADR。
+
 ## 技术方案
 
 - **后端**：自研 Midway.js 3.x + PostgreSQL
@@ -70,8 +72,9 @@
 
 ## 未决问题
 
-- PR1/PR2 前定版 ORM/迁移方案：继续 TypeORM，还是切 Drizzle/Prisma。当前 PR0 仅保留 TypeORM subscriber 骨架用于隔离验证。
 - ⚠️ **合规 P0 blocker**：平台 ICP/EDI 资质 + 微信/支付宝服务商进件；**P1**：跨境收款开户 + 企业对公结汇 + 数据出境合规。
+
+> ✅ ORM/迁移方案已于 2026-07-09 决策（继续 TypeORM 0.3.x），见决策 D12 与 `07-09-pr1-walking-skeleton` ADR。
 
 > 🔁 架构调整（2026-07-08）：用户确认 **使用 Midway.js 做主后端，不使用 cool-admin v8**。PR0 从 vendor cool-admin 改为自研 Midway.js 基座：租户上下文、RBAC、数据访问、支付通道、审计、任务调度由项目自建。
 

@@ -19,6 +19,22 @@
   white-space: nowrap;
 }
 
+.descCell {
+  max-width: 320px;
+  white-space: normal;
+  word-break: break-word;
+  color: #486581;
+}
+
+.link {
+  color: #0b69a3;
+  font-weight: 700;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
 .table th {
   background: #f8fafc;
   color: #486581;

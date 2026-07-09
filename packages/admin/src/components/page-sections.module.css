@@ -1,0 +1,38 @@
+/* demo resource 各页共用的 section / 标题 / 备注 / 错误样式。 */
+.section {
+  margin: 0 0 28px;
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: #243b53;
+}
+
+.note {
+  margin: 10px 0 0;
+  color: #627d98;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.pageError {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: #fff5f5;
+  border: 1px solid #f8c1bd;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.backLink {
+  display: inline-block;
+  margin: 0 0 20px;
+  color: #0b69a3;
+  font-weight: 700;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}

@@ -50,6 +50,25 @@
   font-weight: 700;
 }
 
+.roleNote {
+  margin: 6px 0 0;
+  color: #829ab1;
+  font-size: 12px;
+}
+
+.switchLink {
+  margin-top: auto;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #9fb3c8;
+  font-size: 13px;
+}
+
+.switchLink:hover {
+  background: #243b53;
+  color: #f8fafc;
+}
+
 .content {
   padding: 32px;
 }
