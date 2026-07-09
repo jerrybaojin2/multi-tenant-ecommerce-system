@@ -21,3 +21,5 @@
 {"file":"packages/app-c/scripts/verify-app-c-skeleton.mjs","reason":"Verify C-end PR1 skeleton keeps direct uni.request inside the shared tenant wrapper and registers the demo page."}
 {"file":"packages/admin/scripts/verify-admin-skeleton.mjs","reason":"Verify admin PR1 skeleton keeps business API calls in Midway.js and forbids src/app/api."}
 {"file":"package.json","reason":"Verify root check command runs backend guards, tests, prod config guard, and frontend skeleton checks."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/storefront-template-architecture.md","reason":"Verify storefront template decisions keep templates presentation-only and preserve shared goods/cart/order/payment/aftersale logic."}
+{"file":".trellis/tasks/07-08-h5-admin-features/research/api-data-model-mapping.md","reason":"Verify storefront template tables and APIs remain tenant-scoped where needed and do not allow arbitrary frontend component loading."}

@@ -55,6 +55,8 @@ const emit = defineEmits<{
 - Product detail 使用一套 page/component flow 和 rent/buy switch；不要创建独立的 rent-only 与 buy-only product detail pages。
 - Cart components 必须支持同一个 tenant bucket 中的 `rent` 和 `sale` rows；checkout 可以把 MVP settlement 限制为一次一个 mode。
 - 注意 mini-program package size：可复用的 heavy components 应放在使用它们的 subpackage 中，除非 main package 也需要。
+- Storefront template sections 必须是 tenant-neutral 的展示区块：接收 typed props、emit typed events，并把商品、购物车、订单、支付等动作交给共享 composables/stores。
+- 后端 template schema 中的 `sectionName` 只能映射到本地已编译 registry，不允许由 schema 直接控制组件路径或动态下载代码。
 
 ---
 
@@ -80,5 +82,6 @@ const emit = defineEmits<{
 
 - 不要从 components 直接调用 `uni.request`。
 - 不要从 component 修改 tenant context。
+- 不要为不同 storefront template 复制商品列表、购物车、订单或支付逻辑；差异应收敛到 schema、props 和 design tokens。
 - 当后端权限模型应决定可见性时，不要仅通过检查前端 surface/config 隐藏 admin features。
 - 不要引入已废弃的 uni UI libraries，例如 `uv-ui`；优先使用 wot-design-uni。

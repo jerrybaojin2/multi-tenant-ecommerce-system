@@ -35,3 +35,5 @@
 {"file":"packages/admin/src/components/admin-shell.tsx","reason":"PR1 shared admin shell for merchant and platform surfaces."}
 {"file":"packages/admin/scripts/verify-admin-skeleton.mjs","reason":"PR1 guard preventing admin business logic from being implemented in Next.js API routes."}
 {"file":"packages/app-c/scripts/verify-app-c-skeleton.mjs","reason":"PR1 guard checking uni-app skeleton, tenant request wrapper, and demo page wiring."}
+{"file":".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/storefront-template-architecture.md","reason":"User-provided storefront template reference distilled into project architecture: configurable templates, compiled section registry, shared business logic."}
+{"file":".trellis/tasks/07-08-h5-admin-features/research/api-data-model-mapping.md","reason":"Storefront template data model and API mapping for tenant theme selection, page schema, section instances, and template registry."}

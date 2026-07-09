@@ -41,6 +41,15 @@ src/
     order.ts
     rental.ts
     pay.ts
+  templates/
+    registry.ts             # compiled storefront template/section registry
+    renderer.vue            # schema-driven renderer for compiled sections
+    default/
+      home-template.vue
+  sections/
+    banner-section.vue
+    product-list-section.vue
+    cart-entry-section.vue
   components/
     goods-card.vue
     rent-buy-switch.vue
@@ -59,6 +68,8 @@ src/
 - Rental fulfillment、order detail、activity/marketing 和 optional tenant features 放在 `subpackages/` 中。
 - C-end plugins 表示为由 tenant/package configuration 在 build time 选择的 subpackages。
 - `pages.json` 是路由注册表。不要把 vue-router 引入 C 端小程序。
+- `templates/` 和 `sections/` 只承载展示组装。它们读取后端下发的页面 schema，但只能渲染已编译 registry 中存在的模板/区块。
+- 模板切换不得复制功能代码。商品、购物车、订单、支付、售后仍通过 `api/`、`stores/` 和 composables 中的共享实现完成。
 
 ---
 
@@ -106,3 +117,4 @@ src/
 - 不可复用的 page-only components 放在对应 page 或 subpackage 旁边。
 - Business calculations 放在 composables 或 pure utilities 中，不放在 templates 内。
 - Tenant、auth、cart 和 rental state 放在独立 stores 中。Tenant 和 cart 必须保持解耦。
+- Storefront template state 只保存当前 theme/page schema/design tokens；不得持有商品列表、购物车或订单的业务真相。

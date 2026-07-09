@@ -123,14 +123,29 @@
 | `articles` | 文章/帮助 | category、title、content、author、view_count、status |
 | `announcements` | 公告 | title、content、scope(shop/platform)、status、publish_at |
 
-### 11. C 端用户模块（consumer-user）
+### 11. 商城模板模块（storefront-template）
+
+> 模板只控制展示层。商品、购物车、订单、支付、售后等功能继续使用各自领域模块，不在模板表中复制业务数据。
+
+| 表 | 用途 | 关键字段 | 隔离 |
+|---|---|---|---|
+| `storefront_themes` | 模板定义 | name、code、status、preview_image、default_schema(jsonb)、design_tokens(jsonb) | 平台级 |
+| `storefront_theme_versions` | 模板版本 | theme_id、version、schema_diff(jsonb)、release_note、status | 平台级 |
+| `tenant_storefront_settings` | 租户当前模板 | tenant_id、theme_id、theme_version_id、design_tokens_override(jsonb)、logo、status | tenant_id |
+| `storefront_page_instances` | 租户页面实例 | tenant_id、theme_id、page_type(home/product/detail)、title、status | tenant_id |
+| `storefront_section_instances` | 页面区块实例 | tenant_id、page_instance_id、section_name、sort、props(jsonb)、visibility | tenant_id |
+| `storefront_section_registry` | 区块元数据 | name、display_name、default_props(jsonb)、props_schema(jsonb)、allowed_page_types(jsonb)、status | 平台级 |
+
+> 小程序前端的 section registry 仍以已编译代码白名单为准；`storefront_section_registry` 只用于后台配置、预览和校验，不允许让前端动态加载任意 component path。
+
+### 12. C 端用户模块（consumer-user）
 
 | 表 | 用途 | 关键字段 |
 |---|---|---|
 | `tenant_users` | 租户用户 | phone、openid、union_id(预留全局)、nickname、avatar、status | union_id 预留（D9） |
 | `user_addresses` | 用户地址 | user_id、name、phone、province、city、district、detail、is_default |
 
-### 12. 权限模块（rbac，双品牌共用）
+### 13. 权限模块（rbac，双品牌共用）
 
 > 权限按租户隔离：商家管理员权限在各自 tenant 范围内；平台管理员通过 platform scope 跨租户。
 
@@ -142,7 +157,7 @@
 | `admin_role_menus` | 角色-菜单关联 | role_id、menu_id | - |
 | `admin_user_roles` | 用户-角色关联 | user_id、role_id | - |
 
-### 13. 平台模块（platform，非租户隔离）
+### 14. 平台模块（platform，非租户隔离）
 
 | 表 | 用途 | 关键字段 |
 |---|---|---|
@@ -154,7 +169,7 @@
 | `withdrawals` | 提现申请 | merchant_id、amount、status(待审核/已打款/拒绝)、bank_info、applied_at |
 | `audit_logs` | 审计日志 | operator_id、brand、action、target、target_id、ip、payload(jsonb)、created_at |
 
-### 14. 租赁模块（rental，全部预留）
+### 15. 租赁模块（rental，全部预留）
 
 | 表 | 用途 | 关键字段 | 状态 |
 |---|---|---|---|
@@ -173,6 +188,7 @@ merchants (平台)
        ├─ aftersales
        ├─ payment_orders ── funds_ledgers
        ├─ coupons / members / member_points (用户级，tenant_users 下)
+       ├─ tenant_storefront_settings / storefront_page_instances / storefront_section_instances
        ├─ tenant_users ── user_addresses / favorites / browse_histories
        └─ admin_users / admin_roles / admin_menus (权限)
 ```
@@ -225,6 +241,8 @@ merchants (平台)
 | 内容 | GET | `/banners` | 首页轮播图 |
 | 内容 | GET | `/announcements` | 公告 |
 | 内容 | GET | `/articles/:id` | 文章详情 |
+| 商城模板 | GET | `/storefront/theme` | 当前租户模板和 design tokens |
+| 商城模板 | GET | `/storefront/pages/:pageType` | 当前租户页面 schema 和区块实例 |
 
 ### 商家端 API（`/admin/merchant/**`）
 
@@ -261,6 +279,10 @@ merchants (平台)
 | 店铺 | GET / PUT | `/shop/profile` | 店铺信息 |
 | 店铺 | GET / PUT | `/shop/settings` | 营业配置 |
 | 店铺 | GET / POST / PUT / DELETE | `/announcements[/:id]` | 公告 |
+| 商城装修 | GET | `/storefront/themes` | 可用模板 |
+| 商城装修 | PUT | `/storefront/active-theme` | 激活模板版本 |
+| 商城装修 | GET / PUT | `/storefront/pages/:pageType` | 查看 / 保存页面区块配置 |
+| 商城装修 | GET / PUT | `/storefront/design-tokens` | 查看 / 保存视觉配置 |
 | 权限 | GET / POST / PUT / DELETE | `/rbac/roles[/:id]` | 角色 |
 | 权限 | GET / POST / PUT / DELETE | `/rbac/users[/:id]` | 用户 |
 | 权限 | GET | `/rbac/menus` | 菜单 |
@@ -291,6 +313,10 @@ merchants (平台)
 | 内容 | GET / POST / PUT / DELETE | `/announcements[/:id]` | 平台公告 |
 | 内容 | GET / POST / PUT / DELETE | `/articles[/:id]` | 文章 |
 | 内容 | GET / POST / PUT / DELETE | `/banners[/:id]` | 平台轮播图 |
+| 商城模板 | GET / POST | `/storefront/themes` | 模板库列表 / 创建模板元数据 |
+| 商城模板 | POST | `/storefront/themes/:id/versions` | 登记模板版本 |
+| 商城模板 | PUT | `/storefront/themes/:id/status` | 启用 / 停用模板 |
+| 商城模板 | GET / POST / PUT / DELETE | `/storefront/section-registry[/:name]` | 区块元数据管理 |
 | 审计 | GET | `/audit-logs` | 操作日志 |
 | 投诉 | GET / PUT | `/complaints[/:id]` | 投诉列表 / 处理 |
 | 物流 | GET / PUT | `/logistics/kdniao-config` | 快递鸟配置 |
@@ -310,5 +336,5 @@ merchants (平台)
 | PR5 | orders、order_items、order_logs、aftersales | 订单 C 端 + 商家端 |
 | PR6 | payment_orders、payment_callbacks、funds_ledgers、coupons | 支付 C 端 + 资金商家端 |
 | PR7 | shipments、rentals、rental_events（预留） | 物流 + 租赁履约（二期） |
-| PR8 | （扩展点） | 策略 demo |
+| PR8 | storefront_themes、tenant_storefront_settings、storefront_page_instances、storefront_section_instances、storefront_section_registry（或其他扩展点） | 策略 demo / 商城模板配置 demo |
 | PR9 | merchant_qualifications、packages、merchant_packages、settlements、withdrawals、audit_logs | 平台端全部 |

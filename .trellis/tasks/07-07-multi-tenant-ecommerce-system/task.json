@@ -24,6 +24,7 @@
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/prd.md",
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/mvp-pr-breakdown.md",
     ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md",
+    ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/storefront-template-architecture.md",
     ".trellis/spec/backend/index.md",
     ".trellis/spec/backend/database-guidelines.md",
     "packages/backend/src/configuration.ts",
@@ -32,7 +33,7 @@
     "scripts/verify-backend-architecture.mjs",
     "tests/real-tenant.test.mjs"
   ],
-  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. 2026-07-09: PR1 stack decisions recorded: C-end uses uni-app; admin uses Next.js. Added staged three-surface Trellis breakdown after PR1 backend demo slice.",
+  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. 2026-07-09: PR1 stack decisions recorded: C-end uses uni-app; admin uses Next.js. Added staged three-surface Trellis breakdown after PR1 backend demo slice. 2026-07-09: Storefront template requirement recorded from user reference: templates can change layout/sections/tokens, but all templates share the same goods/cart/order/payment/aftersale domain logic; mini-program runtime only switches compiled registry entries.",
   "meta": {
     "architecture": "self-built-midway",
     "backendCommit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
@@ -42,6 +43,11 @@
       "test": "rent_test"
     },
     "adminStackDecision": "nextjs",
+    "storefrontTemplateDecision": {
+      "mode": "compiled-registry-plus-backend-schema",
+      "businessLogic": "shared-across-templates",
+      "runtimeNewJs": false
+    },
     "phaseTaskModel": {
       "parent": "multi-tenant-ecommerce-system",
       "phases": [

@@ -19,6 +19,8 @@
 - Admin menus、routes 和 permissions 由后端驱动；前端只渲染后端返回的内容。
 - Admin 通过 Next.js 路由区分 merchant 与 platform surface；品牌差异留在 config、theme、static assets 和 backend menu data 中。
 - C-end plugins 是构建时包含的 uni subpackages。它们不是 runtime hot plugins。
+- C-end 商城模板只能改变布局、区块顺序、design tokens 和展示 props；商品、购物车、订单、支付、售后等功能必须复用同一套 API clients、stores 和 composables。
+- C-end 模板/区块 registry 必须是已编译白名单；后端返回的 schema 不能让小程序运行时加载任意组件路径或下载新 JS。
 
 ---
 
@@ -47,6 +49,7 @@
 - 不存在 frontend spec placeholder text。
 - C-end request wrappers 注入 `X-Tenant-Id`；business code 中不直接使用 `uni.request`。
 - Tenant state 在 initialization 之外只读。
+- 不同 C-end storefront templates 下，核心业务流程使用同一套 shared domain logic，不出现模板专属购物车/订单/支付实现。
 - Admin code 不硬编码本应属于后端的 role/menu/permission decisions。
 - 代码存在后，typecheck、lint 和相关 mini-program/admin build command 通过。
 

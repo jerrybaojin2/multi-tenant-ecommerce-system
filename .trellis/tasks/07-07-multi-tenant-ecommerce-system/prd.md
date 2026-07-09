@@ -33,6 +33,8 @@
 
 **D10 — 仓库结构**：**单仓 monorepo（pnpm workspace）**。根目录 `packages/{backend, app-c, admin}`：backend=自研 Midway.js 主后端、app-c=uni-app Vue3 C 端、admin=Next.js 独立管理端。统一依赖/CI/脚本/版本。
 
+**D11 — C 端商城模板**：**模板可更换，但功能能力必须一致**。模板只负责页面布局、区块顺序、视觉 tokens 和展示属性；商品、购物车、订单、支付、售后等功能只实现一套共享 domain/API/state。微信小程序不能运行时下载新 JS，因此 C 端只能在已编译进包内的模板/区块 registry 中切换；新增模板代码或新区块类型需要重新构建发版。
+
 ## 技术方案
 
 - **后端**：自研 Midway.js 3.x + PostgreSQL
@@ -42,7 +44,7 @@
   - 扩展机制：不做 cool-admin 插件运行时；以领域模块 + Strategy 扩展点替代
 - **数据库**：PostgreSQL；所有 tenant-owned 表含 `tenant_id`；RLS 作为防线；生产禁 schema auto-sync
 - **支付（多通道 D8）**：境内微信服务商分账 + 支付宝；境外连连/PingPong；PaymentChannel Strategy 统一抽象、按区域/业务路由；押金强制境内通道
-- **C 端**：uni-app Vue3 + Vite + TS + wot-design-uni + Pinia；每商家独立小程序 AppID + `VITE_TENANT_ID` + 请求头 `X-Tenant-Id`；购物车 `Record<tenantId, CartItem[]>` 分桶；租/买双入口 Tab
+- **C 端**：uni-app Vue3 + Vite + TS + wot-design-uni + Pinia；每商家独立小程序 AppID + `VITE_TENANT_ID` + 请求头 `X-Tenant-Id`；购物车 `Record<tenantId, CartItem[]>` 分桶；租/买双入口 Tab；模板层只组装已编译区块，不复制业务逻辑
 - **Admin**：Next.js 独立管理端；商家后台 + 平台后台共用权限模型，菜单/权限后端驱动；业务流程不得放入 Next.js API routes
 
 ## 关键约束与风险（必须遵守）
@@ -51,6 +53,7 @@
 - ⚠️ **原生 SQL 绕过租户过滤** → 静默跨租户泄漏。PR2 必须用 lint/审查规则拦截 raw query；RLS 作为 DB 兜底。
 - ⚠️ **生产关闭 schema auto-sync 与开发元数据/调试端点**。
 - ⚠️ **C 端微信小程序无运行时热插**（微信禁运行时下载 JS）→ C 端扩展只能 uni 分包 + 构建期纳入。
+- ⚠️ **模板更换不能改变功能实现**：模板 schema、区块 props 和 design tokens 可以由后台配置；业务 API、状态机、购物车和订单流程必须共享同一套实现。
 - ⚠️ **支付合规**：平台 ICP/EDI、微信/支付宝服务商进件、跨境收款开户与数据出境合规属 P0/P1 blocker。
 
 ## 研究已完成
@@ -61,6 +64,7 @@
 - [`research/mvp-pr-breakdown.md`](research/mvp-pr-breakdown.md) — 10 个 PR 序列 + agent 映射 + 并行波次
 - [`research/frontend-cross-platform.md`](research/frontend-cross-platform.md) — C 端仅 MP；admin 双品牌；前端租户上下文约束
 - [`research/frontend-uni-stack.md`](research/frontend-uni-stack.md) — uni Vue3+wot-design-uni；避雷 uv-ui
+- [`research/storefront-template-architecture.md`](research/storefront-template-architecture.md) — C 端商城模板可换但功能一致；模板 schema/区块 registry/租户配置边界
 - [`research/backend-framework.md`](research/backend-framework.md) / [`research/backend-orm-db.md`](research/backend-orm-db.md) — 历史选型研究；当前确认自研 Midway.js 主后端，并保留 PostgreSQL/RLS 的安全结论
 - [`research/cool-admin-multi-tenant.md`](research/cool-admin-multi-tenant.md) / [`research/plugin-architecture.md`](research/plugin-architecture.md) — 历史参考，不再作为目标架构
 
@@ -97,6 +101,7 @@
 - 租售结合（订单主表+行级类型+租赁子表）
 - 扩展机制采用项目内模块化 + Strategy，不复用 cool-admin 插件运行时
 - **MVP = 租售并行完整**，C 端仅微信小程序
+- 前端商城支持更换模板；模板只影响展示层，所有模板共享商品/购物车/订单/支付/售后功能
 - 消息通知：MVP 用微信小程序订阅消息（支付成功 / 发货 / 租赁到期）
 
 ## 验收标准（持续演进）
@@ -108,6 +113,7 @@
 - [ ] 租赁流程（押金冻结/租期/归还/续租/逾期/买断）+ 零售流程（发货/自提/收货）可用
 - [ ] 资金三类（押金/租金/货款）独立台账，押金随状态机事件联动
 - [ ] 支付通道/业务扩展可通过模块化 Strategy 接入，后台可配置启停
+- [ ] 不同商城模板下，商品、购物车、订单、支付、售后流程仍走同一套共享 API/state，并通过同一组验收用例
 - [ ] 生产环境 schema auto-sync 与开发元数据/调试端点已关闭
 
 ## 完成定义

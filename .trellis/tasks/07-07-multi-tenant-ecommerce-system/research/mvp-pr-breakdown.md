@@ -17,6 +17,7 @@
 7. 生产配置保持 `synchronize:false` 和 `appMeta.exposeDevMetadata:false`。
 8. C 端 MVP 仅微信小程序。小程序客户端不支持运行时插件加载，此项不在范围内。
 9. 支付回调和定时任务没有天然的用户 JWT，必须显式建立租户上下文。
+10. C 端商城模板可更换，但模板只改变布局/区块/样式配置；商品、购物车、订单、支付、售后必须走同一套共享 API、stores 和 domain composables。
 
 ## PR 总览
 
@@ -56,6 +57,7 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
   - 后端: 在 `/admin/merchant/**`、`/admin/platform/**` 和 `/app/consumer/**` 后面创建真实 tenant-scoped demo resource。
   - C 端: uni-app Vue3 骨架，包含 tenant-aware 请求封装和一个 demo 页面。
   - Admin: 使用 Next.js 落地登录壳、路由壳和角色感知菜单占位。
+  - 记录 C 端 storefront template registry 的边界：PR1 只保留骨架与规范，不做完整模板编辑器。
 - 验收:
   - 商家上下文只能看到本租户数据。
   - 平台角色可以通过平台路由有意查看跨租户 demo 数据。
@@ -81,6 +83,7 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
   - 仅在需要灵活结构的位置使用 JSONB 保存租赁计价规则。
   - Admin 商品配置页面。
   - C 端商品列表/详情，包含租赁与购买入口。
+  - C 端商品区块必须可被不同 storefront template 复用，不允许模板专属商品 API 或专属商品状态。
 - 验收:
   - 同一商品可以仅售卖、仅租赁或同时支持两者。
   - 租户隔离回归覆盖商品列表/详情/更新/删除。
@@ -104,6 +107,7 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
   - 订单主信息、订单行、售卖/租赁行类型、租赁子表和租赁事件流。
   - 为售卖交易状态和租赁履约状态建立显式状态转移表。
   - C 端结算/订单列表/订单详情。
+  - C 端模板切换后，购物车和订单流程仍使用同一套 store/API；模板只能替换入口位置和视觉样式。
   - Admin 订单管理和履约动作入口。
 - 验收:
   - 合法转移由参数化测试覆盖。
@@ -137,12 +141,13 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
 
 - 范围:
   - 演示项目自有 module/Strategy 扩展点，不依赖 cool-admin plugin runtime。
-  - 候选: 支付通道 sandbox、公告模块或租赁计价 Strategy。
+  - 候选: 支付通道 sandbox、公告模块、租赁计价 Strategy 或 storefront template/theme 配置 demo。
   - Admin 配置表面，支持按租户开启/关闭功能。
 - 验收:
   - 功能可以按租户启用/禁用。
   - 扩展数据保持 tenant-scoped。
   - C 端扩展表面仅支持构建期/路由期，不做 runtime JS loading。
+  - 如果选择 storefront template demo，不同模板下核心购物/下单/支付验收用例相同。
 
 ## PR9 - 平台运营
 

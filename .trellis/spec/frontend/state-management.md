@@ -27,6 +27,7 @@ stores/
   auth.ts       # token/user session
   cart.ts       # buckets: Record<tenantId, CartItem[]>
   rental.ts     # rental checkout/return/renewal temporary state
+  storefront.ts # current template/page schema/design tokens only
 ```
 
 Admin stores：
@@ -86,6 +87,7 @@ type CartState = {
 - 只存储持久会话状态、drafts，或跨多个 pages 复用的数据。
 - 变更后重新加载服务端列表，除非有清晰的乐观更新规则。
 - Admin 菜单/权限状态属于后端 menu/perms response；Next.js 只负责渲染和局部交互状态。
+- Storefront template schema 可以缓存为服务端状态，但它只描述页面结构和展示配置；商品、购物车、订单、支付和售后的业务数据不能塞进 template state。
 
 ---
 
@@ -95,3 +97,4 @@ type CartState = {
 - 不要持久化未限定 tenant 的 cart arrays。
 - 不要让 business code 从 route/query/scene parameters 设置 tenant id。
 - 不要把 frontend permission state 当作安全边界。
+- 不要把不同模板实现成不同 store 或不同业务流程。模板切换必须只改变渲染 schema/design tokens。

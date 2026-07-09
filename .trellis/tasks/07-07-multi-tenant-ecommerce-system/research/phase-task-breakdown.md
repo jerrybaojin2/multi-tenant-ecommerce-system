@@ -50,6 +50,7 @@ multi-tenant-ecommerce-system
   - 构建 uni-app Vue3 请求封装。
   - 添加一个调用 `/app/consumer/demo-resources` 的 demo 页面。
   - 确认租户 header/auth 边界。
+  - 记录 storefront template registry 约束：模板只组装已编译区块，功能逻辑仍在共享 API/store/composable。
 - Admin:
   - 使用 Next.js 添加登录壳、路由壳和角色感知菜单占位。
   - 添加商家 demo resource 页面和平台 demo resource 页面。
@@ -70,6 +71,7 @@ multi-tenant-ecommerce-system
   - 商品列表/详情。
   - 购买/租赁入口。
   - 预计租金展示。
+  - 商品列表/详情以可复用 section/component 形态落地，支持未来多个 storefront template 复用。
 - Admin:
   - 商品管理。
   - 库存与租赁可用性看板。
@@ -86,6 +88,7 @@ multi-tenant-ecommerce-system
   - 创建/取消/退款时的库存预约与释放。
 - C 端:
   - 购物车、结算、订单列表和订单详情。
+  - 不同 storefront template 下复用同一套购物车/订单 store 和 API。
 - Admin:
   - 订单管理壳。
   - 履约动作占位。
@@ -123,6 +126,7 @@ multi-tenant-ecommerce-system
 - C 端:
   - 用户可见的租户/商家套餐效果。
   - 仅支持构建期或路由期扩展表面。
+  - 商城模板库、租户当前模板、页面区块 schema 和 design tokens 的后台配置能力。
 - Admin:
   - 平台运营控制台。
   - 商家入驻和套餐管理。
@@ -131,6 +135,7 @@ multi-tenant-ecommerce-system
   - 平台服务有角色守护并记录审计。
   - 普通商家路由不能访问跨租户操作。
   - 迁移和生产守护纳入根检查。
+  - 模板切换不会改变商品、购物车、订单、支付、售后业务结果。
 
 ## 子任务创建规则
 

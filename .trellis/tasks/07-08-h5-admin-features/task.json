@@ -42,6 +42,11 @@
       "topic": "Admin 技术栈",
       "decision": "管理后台使用 Next.js + TypeScript，业务流程调用自研 Midway.js 后端 API",
       "rationale": "用户已确认不使用 cool-admin v8/cool-admin-vue 作为目标实现；Next.js 不承载后台业务 API routes"
+    },
+    {
+      "topic": "商城模板",
+      "decision": "前端商城支持更换模板，但模板只改变布局、区块、样式和展示 props，功能能力共享同一套实现",
+      "rationale": "用户要求参考本地模板方案文档；小程序不能运行时下载新 JS，因此模板切换必须基于已编译 registry 和后端配置 schema"
     }
   ],
   "deliverables": [
