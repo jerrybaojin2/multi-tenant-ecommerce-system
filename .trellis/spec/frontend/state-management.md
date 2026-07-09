@@ -31,7 +31,7 @@ stores/
 
 Admin stores：
 
-- 对 user、app、menu、route、permission 和 process state 使用 cool-admin-vue base stores。
+- Admin 状态优先来自 Next.js server data、URL/search params 和后端 menu/perms response。
 - 只有当 state 被多个 views 复用，且不能留在 URL/query/local component state 中时，才添加 domain stores。
 
 ---
@@ -85,7 +85,7 @@ type CartState = {
 - 默认不要把完整服务端列表镜像进 Pinia。
 - 只存储持久会话状态、drafts，或跨多个 pages 复用的数据。
 - 变更后重新加载服务端列表，除非有清晰的乐观更新规则。
-- Admin 菜单/权限状态属于现有 cool-admin-vue menu/permission flow。
+- Admin 菜单/权限状态属于后端 menu/perms response；Next.js 只负责渲染和局部交互状态。
 
 ---
 

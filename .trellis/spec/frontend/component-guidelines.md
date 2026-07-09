@@ -6,7 +6,7 @@
 
 ## 概览
 
-使用 Vue 3 SFCs 和 `<script setup lang="ts">`。C 端组件应优先使用 wot-design-uni，其次用 uni-ui 作为稳定官方 fallback。Admin 组件应遵循 cool-admin-vue 和 Element Plus/cool-crud patterns。
+使用 Vue 3 SFCs 和 `<script setup lang="ts">` 构建 C 端组件。C 端组件应优先使用 wot-design-uni，其次用 uni-ui 作为稳定官方 fallback。Admin 组件使用 React/Next.js 组件，并保持后端权限驱动。
 
 组件必须保持 tenant-neutral。它们接收数据并 emit events；它们不修改 `tenantStore`、不设置 tenant headers，也不决定 admin permissions。
 
@@ -60,8 +60,8 @@ const emit = defineEmits<{
 
 ## Admin 组件
 
-- 遵循 cool-admin-vue module conventions，并在添加新 primitives 前复用现有 base components。
-- 使用后端 `perms`/permission directives 控制按钮可见性；绝不要把硬编码角色名当作事实来源。
+- 遵循 Next.js App Router 的页面/组件边界，并在添加新 primitives 前复用现有 admin shell 组件。
+- 使用后端返回的 perms/menu 控制按钮可见性；绝不要把硬编码角色名当作事实来源。
 - 平台专属的租户 filters/columns 属于 platform views 或后端提供的 schema；merchant views 不应展示跨租户 controls。
 - 品牌差异应来自 config/theme/logo，而不是重复 component trees。
 
@@ -80,5 +80,5 @@ const emit = defineEmits<{
 
 - 不要从 components 直接调用 `uni.request`。
 - 不要从 component 修改 tenant context。
-- 当后端权限模型应决定可见性时，不要仅通过检查 `VITE_BRAND` 隐藏 admin features。
+- 当后端权限模型应决定可见性时，不要仅通过检查前端 surface/config 隐藏 admin features。
 - 不要引入已废弃的 uni UI libraries，例如 `uv-ui`；优先使用 wot-design-uni。

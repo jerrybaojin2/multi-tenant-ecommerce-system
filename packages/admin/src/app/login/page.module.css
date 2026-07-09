@@ -1,0 +1,64 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.panel {
+  width: min(100%, 420px);
+  padding: 32px;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.kicker {
+  margin: 0 0 8px;
+  color: #627d98;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.panel h1 {
+  margin: 0 0 24px;
+  font-size: 26px;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.form label {
+  display: grid;
+  gap: 8px;
+  color: #334e68;
+  font-weight: 700;
+}
+
+.form input {
+  width: 100%;
+  border: 1px solid #bcccdc;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.form button {
+  border: 0;
+  border-radius: 6px;
+  padding: 12px;
+  background: #0b69a3;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.note {
+  margin: 18px 0 0;
+  color: #627d98;
+  font-size: 13px;
+  line-height: 1.6;
+}

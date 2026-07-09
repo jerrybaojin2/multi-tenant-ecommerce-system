@@ -1,6 +1,6 @@
 # 目录结构
 
-> uni-app C-end 与 cool-admin-vue admin 的前端代码如何组织。
+> uni-app C-end 与 Next.js admin 的前端代码如何组织。
 
 ---
 
@@ -9,7 +9,7 @@
 保持 C 端和 admin 前端分离，因为它们有不同运行时约束：
 
 - C 端使用 uni-app pages、`pages.json`、mini-program subpackages、`uni.request` 和 wot-design-uni。
-- Admin 使用 cool-admin-vue modules/plugins、Vue Router、后端驱动菜单和按品牌构建。
+- Admin 使用 Next.js App Router、后端驱动菜单和按 surface 区分的商家/平台页面。
 
 不要把 admin 抽象混入 C 端代码。不要围绕运行时 route/component loading 设计 C 端代码；微信小程序 pages 必须静态注册。
 
@@ -64,32 +64,29 @@ src/
 
 ## Admin 布局
 
-使用 cool-admin-vue 8.x conventions：
+使用 Next.js App Router：
 
 ```text
 src/
-  config/                 # brand, theme, app config from env
-  modules/
-    base/
-    merchant/             # merchant-only modules, enable by VITE_BRAND
-    platform/             # platform-only modules, enable by VITE_BRAND
-  plugins/
-    <plugin-name>/
-      config.ts
-      service/
-      views/
-      pages/
-      components/
-      locales/
+  app/
+    login/
+      page.tsx
+    merchant/
+      demo-resources/
+        page.tsx
+    platform/
+      demo-resources/
+        page.tsx
+  components/
+  lib/
 ```
 
 规则：
 
-- 使用 `vite build --mode merchant` 或 `vite build --mode platform` 构建。
-- `.env.merchant` 和 `.env.platform` 设置 `VITE_BRAND`、`VITE_NAME`、API base 和 theme values。
-- 按品牌启用 module 属于 module/plugin `config.ts`；避免在 views 中分散 `if brand` checks。
-- Menus 和 permissions 来自后端 `permmenu` flow。前端路由应遵循返回的 menu data 和 view paths。
-- 如果 plugin admin pages 由后端 `viewPath` 路由，当实现进入对应 PR 时，确认 route glob 同时包含 `modules/*` 和 `plugins/*` views。
+- 不要在 `src/app/api` 中实现业务流程；管理端业务请求必须调用 Midway.js 后端。
+- `merchant` 与 `platform` surface 可以共享 layout/component，但权限和菜单以后端返回为准。
+- `.env` 设置 `NEXT_PUBLIC_API_BASE_URL` 和必要的本地开发租户标识。
+- 品牌差异来自 config/theme/static assets 和后端 menu data，避免在 pages 中分散硬编码角色判断。
 
 ---
 

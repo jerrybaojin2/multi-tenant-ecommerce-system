@@ -7,8 +7,8 @@ Multi-tenant rental + retail SaaS platform. pnpm monorepo (D10).
 | Package | Stack | Status |
 |---|---|---|
 | `packages/backend` | Self-developed Midway.js 3.x + TypeORM + PostgreSQL backend | Main backend; tenant isolation uses `tenant_id` plus tenant context |
-| `packages/app-c` | uni-app Vue3 + Vite + TS + wot-design-uni + Pinia (WeChat MP) | Placeholder; scaffold = PR1 |
-| `packages/admin` | Admin stack is not finalized: PR1 chooses Next.js or Vue | Placeholder; product shape is merchant console + platform ops console |
+| `packages/app-c` | uni-app Vue3 + Vite + TS + wot-design-uni + Pinia (WeChat MP) | PR1 tenant-aware demo skeleton |
+| `packages/admin` | Next.js + TypeScript | PR1 admin shell for merchant console + platform ops console |
 
 ## Backend Direction
 
@@ -35,10 +35,9 @@ environment files may add package-specific overrides as the backend evolves.
 
 ## Admin Direction
 
-`packages/admin` is intentionally a placeholder until PR1. The admin product
-needs both a merchant console and a platform operations console, but the
-frontend stack is still undecided. PR1 will choose either Next.js or Vue and
-then land the scaffold, routing, auth shell, and build commands.
+`packages/admin` uses Next.js for the merchant console and platform operations
+console. Backend business logic remains in the Midway.js service; the admin app
+does not own API routes for domain workflows.
 
 ## Local Checks
 
@@ -56,7 +55,7 @@ that require a real database should report the missing dependency clearly.
 - Tenant context must be resolved at backend boundaries before tenant-scoped
   reads or writes.
 - Production database config must not auto-sync schemas.
-- Admin PR1 must record the chosen stack and remove the placeholder language.
+- Admin uses Next.js and must keep domain workflows in the Midway.js backend.
 - C-end is WeChat mini-program only for MVP; runtime plugin loading is out of
   scope for the mini-program client.
 

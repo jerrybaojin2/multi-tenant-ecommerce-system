@@ -13,7 +13,8 @@
     "guard:backend-architecture": "node scripts/verify-backend-architecture.mjs",
     "guard:prod-config": "node scripts/check-prod-config.mjs",
     "guard:docker": "node scripts/check-docker.mjs",
-    "check": "npm run guard:backend-architecture && npm run test && npm run guard:prod-config",
+    "check:frontends": "npm --prefix packages/app-c run check && npm --prefix packages/admin run check",
+    "check": "npm run guard:backend-architecture && npm run test && npm run guard:prod-config && npm run check:frontends",
     "check:all": "pnpm -r run check || true && npm run check"
   },
   "packageManager": "pnpm@7.33.6"

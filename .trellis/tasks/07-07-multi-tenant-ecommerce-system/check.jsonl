@@ -18,3 +18,6 @@
 {"file":"packages/backend/src/core/tenant/tenant-context.ts","reason":"Verify AsyncLocalStorage tenant context contract."}
 {"file":"packages/backend/src/core/database/tenant.subscriber.ts","reason":"Verify PR0 query guard behavior and platform bypass contract."}
 {"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md", "reason": "Verify future work against staged backend app-c admin delivery model"}
+{"file":"packages/app-c/scripts/verify-app-c-skeleton.mjs","reason":"Verify C-end PR1 skeleton keeps direct uni.request inside the shared tenant wrapper and registers the demo page."}
+{"file":"packages/admin/scripts/verify-admin-skeleton.mjs","reason":"Verify admin PR1 skeleton keeps business API calls in Midway.js and forbids src/app/api."}
+{"file":"package.json","reason":"Verify root check command runs backend guards, tests, prod config guard, and frontend skeleton checks."}

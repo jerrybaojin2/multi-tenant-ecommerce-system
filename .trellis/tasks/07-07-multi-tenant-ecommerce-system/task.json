@@ -32,7 +32,7 @@
     "scripts/verify-backend-architecture.mjs",
     "tests/real-tenant.test.mjs"
   ],
-  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. Admin stack remains open for PR1. Added staged three-surface Trellis breakdown after PR1 backend demo slice.",
+  "notes": "2026-07-08: Synced task records after commit bb3ca39. Backend direction changed from cool-admin v8 vendor/runtime to self-built Midway.js 3.x + PostgreSQL. 2026-07-09: PR1 stack decisions recorded: C-end uses uni-app; admin uses Next.js. Added staged three-surface Trellis breakdown after PR1 backend demo slice.",
   "meta": {
     "architecture": "self-built-midway",
     "backendCommit": "bb3ca3958c4bccf86de2b7d60311cae46ebb82e0",
@@ -41,7 +41,7 @@
       "dev": "rent_dev",
       "test": "rent_test"
     },
-    "adminStackDecision": "open-pr1",
+    "adminStackDecision": "nextjs",
     "phaseTaskModel": {
       "parent": "multi-tenant-ecommerce-system",
       "phases": [

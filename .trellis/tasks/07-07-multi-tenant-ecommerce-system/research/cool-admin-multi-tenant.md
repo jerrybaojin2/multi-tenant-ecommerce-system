@@ -1,5 +1,7 @@
 # 研究：cool-admin/node（Midway）— 多租户 SaaS 可行性
 
+> **当前状态说明（2026-07-09）**：本文仅保留为历史研究参考。当前目标架构已经调整为自研 Midway.js 主后端 + PostgreSQL，C 端小程序使用 uni-app，管理后台使用 Next.js；不使用 cool-admin v8 运行时或 cool-admin-vue 作为目标实现。
+
 - **查询**：验证 cool-admin/node 作为多租户 SaaS 后端基座的可行性 — 多租户能力、真实技术栈、三端（C / B / 平台）组织方式。
 - **范围**：外部（官方文档 + GitHub 源码）
 - **日期**：2026-07-07

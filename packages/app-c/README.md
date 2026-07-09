@@ -8,9 +8,15 @@ C-end WeChat mini-program. Stack (per `.trellis/spec/frontend/`):
 - `uni.request` wrapper injecting `X-Tenant-Id` from read-only `tenantStore`
 - Per-merchant mini-program AppID with compile-time `VITE_TENANT_ID`
 
-## PR0 status
+## PR1 status
 
-Placeholder only. The uni-app scaffold (CLI template, `pages.json`,
-`utils/request.ts`, `stores/tenant.ts`, `X-Tenant-Id` interceptor) lands in the
-walking-skeleton PR. MVP targets `MP-WEIXIN` only; no H5/App abstraction is
-introduced prematurely (D7).
+The first walking-skeleton scaffold is in place:
+
+- `src/pages.json` registers the demo page.
+- `src/stores/tenant.ts` initializes read-only tenant context from
+  `VITE_TENANT_ID`.
+- `src/utils/request.ts` wraps `uni.request` and injects `X-Tenant-Id`.
+- `src/pages/demo/index.vue` calls `/app/consumer/demo-resources`.
+
+MVP targets `MP-WEIXIN` only; no H5/App abstraction is introduced prematurely
+(D7).

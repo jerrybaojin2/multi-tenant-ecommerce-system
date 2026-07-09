@@ -1,0 +1,14 @@
+{
+  "name": "miniapp-rent",
+  "appid": "__UNI__MINIAPP_RENT",
+  "description": "多租户租售 C 端微信小程序",
+  "versionName": "0.1.0",
+  "versionCode": "1",
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": true
+    },
+    "usingComponents": true
+  }
+}

@@ -1,5 +1,7 @@
 # 研究：跨平台端取舍 + 前端架构细化（多租户租售电商）
 
+> **当前状态说明（2026-07-09）**：本文中的 cool-admin-vue admin 方案仅保留为历史研究参考。当前 PR1 决策为：C 端小程序使用 uni-app 架构，管理后台使用 Next.js，所有后台业务流程调用自研 Midway.js 后端，不放入 Next.js API routes。
+
 - **查询**: 跨平台目标端（MVP 是否只微信小程序 / H5 / App 何时进）；C 端 uni 架构细化（目录、请求层 X-Tenant-Id 拦截器、多租户购物车分桶、租/买双入口、租赁/归还交互）；B/平台 admin 双品牌构建、菜单/权限按角色+租户隔离、插件动态加载；C 端小程序插件分包纳入。
 - **范围**: mixed（external：cool-admin-vue 8.x 源码实证 + uni-app 官方机制；internal：基于已定 PRD 与 frontend-uni-stack.md）
 - **日期**: 2026-07-07

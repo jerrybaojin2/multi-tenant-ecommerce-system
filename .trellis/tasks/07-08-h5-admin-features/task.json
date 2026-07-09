@@ -3,7 +3,7 @@
   "description": "系统性地梳理二期 H5 前端页面和管理后台（商家端 + 平台端）的功能点，为后续 PR1/PR3-PR9 实现提供清晰的功能范围和验收标准。",
   "status": "planning",
   "created_at": "2026-07-08",
-  "updated_at": "2026-07-08",
+  "updated_at": "2026-07-09",
   "type": "brainstorm",
   "phase": "需求发现",
   "scope": [
@@ -37,6 +37,11 @@
       "topic": "新增功能",
       "decision": "商品分类/评价/收藏/售后/客服/营销（优惠券/会员）/内容管理",
       "rationale": "常见商城系统必备功能"
+    },
+    {
+      "topic": "Admin 技术栈",
+      "decision": "管理后台使用 Next.js + TypeScript，业务流程调用自研 Midway.js 后端 API",
+      "rationale": "用户已确认不使用 cool-admin v8/cool-admin-vue 作为目标实现；Next.js 不承载后台业务 API routes"
     }
   ],
   "deliverables": [

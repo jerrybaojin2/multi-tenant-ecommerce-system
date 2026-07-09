@@ -29,3 +29,9 @@
 {"file":"scripts/verify-backend-architecture.mjs","reason":"Architecture guard for self-built Midway backend markers and forbidden cool-admin runtime dependencies."}
 {"file":"tests/real-tenant.test.mjs","reason":"Real PostgreSQL tenant guard tests using rent_test with clear skip behavior when PostgreSQL is unavailable."}
 {"file": ".trellis/tasks/07-07-multi-tenant-ecommerce-system/research/phase-task-breakdown.md", "reason": "Staged three-surface delivery model for future implementation tasks"}
+{"file":"packages/app-c/src/utils/request.ts","reason":"PR1 C-end tenant-aware uni.request wrapper injecting X-Tenant-Id and auth token from stores."}
+{"file":"packages/app-c/src/pages/demo/index.vue","reason":"PR1 C-end demo page proving uni-app page registration and backend API call path."}
+{"file":"packages/admin/src/lib/demo-resource-api.ts","reason":"PR1 Next.js admin API client calling Midway.js merchant/platform demo endpoints without Next.js API routes."}
+{"file":"packages/admin/src/components/admin-shell.tsx","reason":"PR1 shared admin shell for merchant and platform surfaces."}
+{"file":"packages/admin/scripts/verify-admin-skeleton.mjs","reason":"PR1 guard preventing admin business logic from being implemented in Next.js API routes."}
+{"file":"packages/app-c/scripts/verify-app-c-skeleton.mjs","reason":"PR1 guard checking uni-app skeleton, tenant request wrapper, and demo page wiring."}

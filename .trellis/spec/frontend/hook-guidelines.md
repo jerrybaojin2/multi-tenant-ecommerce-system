@@ -9,7 +9,7 @@
 使用 Vue composables 复用前端逻辑。命名为 `useXxx`，并保持框架适配：
 
 - C-end composables 可以调用 uni APIs 和 Pinia stores。
-- Admin composables 可以使用 cool-admin-vue services、router 和 permission helpers。
+- Admin 侧使用 Next.js/React helpers 和后端 API client；不要把业务流程放进 Next.js API routes。
 - Shared pure logic 应是 typed utility，而不是 composable。
 
 ---
@@ -43,8 +43,8 @@ C-end：
 
 Admin：
 
-- 可用时使用 cool-admin-vue service/eps conventions。
-- Menus 和 permissions 从后端 `permmenu` 加载，并驱动 route/menu rendering。
+- 使用 Next.js server/client component 边界时，API client 仍调用 Midway.js 后端。
+- Menus 和 permissions 从后端加载，并驱动 route/menu rendering。
 - 不要用纯前端 filters 绕过后端权限和 tenant checks。
 
 服务端状态通常应在 page entry 或 action completion 时重新加载。只有 invalidation rule 清楚时才添加 caching。

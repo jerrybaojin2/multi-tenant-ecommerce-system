@@ -21,7 +21,7 @@
 |---|---|---|
 | C 端 MVP | uni-app Vue3 + Vite + TS + wot-design-uni + Pinia | 微信小程序 |
 | H5 二期 | 待定 | 待定 |
-| Admin | cool-admin-vue 8.x（Vue 3.5 + Vite + Pinia + vue-router） | merchant（商家） + platform（平台） |
+| Admin | Next.js + TypeScript；业务流程全部调用自研 Midway.js 后端 API，不放入 Next.js API routes | merchant（商家） + platform（平台） |
 
 ### 当前 PR 序列
 - PR0: ✅ 自研 Midway 基座 + 多租户隔离验证
@@ -200,7 +200,7 @@
 ### 不在本次梳理范围
 - 具体实现细节（留到各 PR）
 - H5 技术栈选型（后续单独决策）
-- Admin 技术栈选型（PR1 前决策）
+- Admin UI 组件库/设计系统选型（后续如需引入 Ant Design、shadcn/ui 等，必须先确认）
 
 ## 技术映射（API + 数据模型）
 

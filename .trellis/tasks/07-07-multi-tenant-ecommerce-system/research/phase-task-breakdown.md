@@ -51,14 +51,13 @@ multi-tenant-ecommerce-system
   - 添加一个调用 `/app/consumer/demo-resources` 的 demo 页面。
   - 确认租户 header/auth 边界。
 - Admin:
-  - 决定 admin 技术栈：Next.js 或 Vue。
-  - 添加登录壳、路由壳和角色感知菜单占位。
+  - 使用 Next.js 添加登录壳、路由壳和角色感知菜单占位。
   - 添加商家 demo resource 页面和平台 demo resource 页面。
 - 横切验收:
   - Tenant A 商家只能看到 Tenant A 的 demo resources。
   - Tenant B C 端不能看到 Tenant A 的 resources。
   - 平台路由有意列出跨租户数据。
-  - Admin 技术栈决策已记录到 PRD 和前端 spec。
+  - Admin Next.js 决策已记录到 PRD 和前端 spec。
 
 ## 阶段 02 - 商品与库存
 

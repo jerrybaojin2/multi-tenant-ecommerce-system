@@ -1,0 +1,16 @@
+{
+  "pages": [
+    {
+      "path": "pages/demo/index",
+      "style": {
+        "navigationBarTitleText": "租赁平台"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "租赁平台",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f6f7f9"
+  }
+}

@@ -2,7 +2,7 @@
 
 ## 目标
 
-构建一个多租户「租售结合」SaaS 平台：后端采用 **自研 Midway.js 主后端（Midway 3.x + PostgreSQL）**，自行实现租户上下文、RBAC、订单、租赁履约、资金台账、支付通道与审计能力；C 端使用 uni-app 微信小程序；B+平台 admin 使用独立 Web 管理端（Next.js 或 Vue，PR1 定版）。支持多商家入驻，同一商品既能出租也能售卖，并保证数据隔离。
+构建一个多租户「租售结合」SaaS 平台：后端采用 **自研 Midway.js 主后端（Midway 3.x + PostgreSQL）**，自行实现租户上下文、RBAC、订单、租赁履约、资金台账、支付通道与审计能力；C 端使用 uni-app 微信小程序；B+平台 admin 使用独立 **Next.js** 管理端。支持多商家入驻，同一商品既能出租也能售卖，并保证数据隔离。
 
 ## 决策（ADR-lite）
 
@@ -31,7 +31,7 @@
 
 **D9 — C 端用户身份**：**每租户独立 + 预留全局**。每个商家小程序有独立 `tenant_user`（带 `tenant_id`）；表预留 `union_id` 字段，未来可升级为跨商家全局用户统一。MVP 不做跨商家识别。
 
-**D10 — 仓库结构**：**单仓 monorepo（pnpm workspace）**。根目录 `packages/{backend, app-c, admin}`：backend=自研 Midway.js 主后端、app-c=uni-app Vue3 C 端、admin=独立管理端（Next.js/Vue 待 PR1 定版）。统一依赖/CI/脚本/版本。
+**D10 — 仓库结构**：**单仓 monorepo（pnpm workspace）**。根目录 `packages/{backend, app-c, admin}`：backend=自研 Midway.js 主后端、app-c=uni-app Vue3 C 端、admin=Next.js 独立管理端。统一依赖/CI/脚本/版本。
 
 ## 技术方案
 
@@ -43,7 +43,7 @@
 - **数据库**：PostgreSQL；所有 tenant-owned 表含 `tenant_id`；RLS 作为防线；生产禁 schema auto-sync
 - **支付（多通道 D8）**：境内微信服务商分账 + 支付宝；境外连连/PingPong；PaymentChannel Strategy 统一抽象、按区域/业务路由；押金强制境内通道
 - **C 端**：uni-app Vue3 + Vite + TS + wot-design-uni + Pinia；每商家独立小程序 AppID + `VITE_TENANT_ID` + 请求头 `X-Tenant-Id`；购物车 `Record<tenantId, CartItem[]>` 分桶；租/买双入口 Tab
-- **Admin**：独立管理端（Next.js 或 Vue，PR1 定版）；商家后台 + 平台后台共用权限模型，菜单/权限后端驱动
+- **Admin**：Next.js 独立管理端；商家后台 + 平台后台共用权限模型，菜单/权限后端驱动；业务流程不得放入 Next.js API routes
 
 ## 关键约束与风险（必须遵守）
 
@@ -66,7 +66,6 @@
 
 ## 未决问题
 
-- PR1 前定版 admin 技术栈：Next.js 还是 Vue。
 - PR1/PR2 前定版 ORM/迁移方案：继续 TypeORM，还是切 Drizzle/Prisma。当前 PR0 仅保留 TypeORM subscriber 骨架用于隔离验证。
 - ⚠️ **合规 P0 blocker**：平台 ICP/EDI 资质 + 微信/支付宝服务商进件；**P1**：跨境收款开户 + 企业对公结汇 + 数据出境合规。
 
@@ -93,7 +92,7 @@
 
 ## 需求（持续演进）
 
-- 后端自研 Midway.js 3.x；前端 uni-app Vue3（C 端）+ 独立管理端（B/平台端）
+- 后端自研 Midway.js 3.x；前端 uni-app Vue3（C 端）+ Next.js 独立管理端（B/平台端）
 - 多租户多商家入驻，共享 PostgreSQL + tenant_id + tenant context + RLS 兜底
 - 租售结合（订单主表+行级类型+租赁子表）
 - 扩展机制采用项目内模块化 + Strategy，不复用 cool-admin 插件运行时
@@ -131,4 +130,4 @@
 
 - greenfield 仓库；项目名 miniAppRentPlatfrom（小程序租赁平台）
 - Midway.js 文档：https://midwayjs.org/
-- Admin 技术栈待 PR1 定版：Next.js 或 Vue 管理端
+- Admin 技术栈已在 PR1 定版：Next.js 管理端

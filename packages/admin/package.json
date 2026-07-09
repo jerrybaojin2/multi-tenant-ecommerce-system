@@ -2,8 +2,22 @@
   "name": "@miniapp-rent/admin",
   "version": "0.0.0-pr0",
   "private": true,
-  "description": "Dual-brand admin placeholder for merchant and platform consoles. PR1 decides Next.js or Vue and lands the scaffold.",
+  "description": "Next.js dual-surface admin shell for merchant and platform consoles.",
   "scripts": {
-    "check": "echo 'admin: scaffold pending; PR1 decides Next.js or Vue'"
+    "check": "node scripts/verify-admin-skeleton.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "typescript": "^5.8.2"
   }
 }

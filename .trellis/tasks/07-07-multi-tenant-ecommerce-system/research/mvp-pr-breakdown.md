@@ -55,7 +55,7 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
 - 范围:
   - 后端: 在 `/admin/merchant/**`、`/admin/platform/**` 和 `/app/consumer/**` 后面创建真实 tenant-scoped demo resource。
   - C 端: uni-app Vue3 骨架，包含 tenant-aware 请求封装和一个 demo 页面。
-  - Admin: 实现前选择 Next.js 或 Vue，然后落地登录壳、路由壳和角色感知菜单占位。
+  - Admin: 使用 Next.js 落地登录壳、路由壳和角色感知菜单占位。
 - 验收:
   - 商家上下文只能看到本租户数据。
   - 平台角色可以通过平台路由有意查看跨租户 demo 数据。
@@ -166,6 +166,5 @@ PR0  自研 Midway 后端基础 + 租户隔离守护
 
 ## PR1/PR2 前的未决决策
 
-- Admin 技术栈: Next.js 或 Vue。
 - ORM/迁移栈: 继续 TypeORM，还是在业务表固化前切换到 Drizzle/Prisma。
 - 合规前置条件: ICP/EDI、WeChat/Alipay 服务商进件、跨境账户/数据合规。
