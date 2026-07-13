@@ -19,7 +19,8 @@
   "pr_url": null,
   "subtasks": [],
   "children": [
-    "07-09-pr1-walking-skeleton"
+    "07-09-pr1-walking-skeleton",
+    "07-13-pr2-ci-rls-migration"
   ],
   "parent": null,
   "relatedFiles": [

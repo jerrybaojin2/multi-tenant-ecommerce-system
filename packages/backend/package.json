@@ -45,7 +45,7 @@
     "migration:run": "mwtsc --cleanOutDir && typeorm migration:run -d dist/core/database/data-source.js",
     "migration:revert": "mwtsc --cleanOutDir && typeorm migration:revert -d dist/core/database/data-source.js",
     "seed": "mwtsc --cleanOutDir && cross-env NODE_ENV=local node dist/core/database/seed.js",
-    "check": "cd ../.. && npm run guard:backend-architecture && npm run guard:prod-config -- packages/backend/src/config/config.prod.ts"
+    "check": "cd ../.. && npm run guard:backend-architecture && npm run guard:prod-config -- packages/backend/src/config/config.prod.ts && npm run guard:raw-sql"
   },
   "bin": "./bootstrap.js",
   "license": "MIT"

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "校验 raw SQL 守护契约、RLS 指南、auto-sync/prod 守护、tenant guard 是否被遵守"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "校验测试覆盖与 node --test 约定是否满足"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "校验新文件放置与 allowlist 路径是否合规"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/raw-sql-guard.md", "reason": "校验 Stream A 实现是否贴合研究结论（标记契约、误报/漏报、check 接线）"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/rls-prototype.md", "reason": "校验 Stream B：text 比较、non-superuser 测试、幂等 DDL、负例覆盖、超级用户陷阱是否处理"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/orm-rls-choice.md", "reason": "校验未擅自切换 ORM 栈、未破坏 after*QueryBuilder guard"}

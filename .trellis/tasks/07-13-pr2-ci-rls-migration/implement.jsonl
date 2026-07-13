@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "PR2 核心契约：raw SQL 禁止清单、Query 模式、RLS 指南、迁移/auto-sync 边界、PR0 tenant guard 契约——raw SQL 守护脚本与 RLS policy 都据此实现"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "确定 raw SQL 守护 allowlist 的合法路径（modules/platform/**、core/database/rls.ts）与新 migration/data-source 放置位置"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "BusinessError 抛错约定与错误码风格，guard/测试失败路径需对齐"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "测试要求与 node --test 约定；PG 不可用 skip 模式"}
+{"file": ".trellis/spec/backend/index.md", "reason": "backend spec 索引/入口，确认其它约定文件是否存在"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/raw-sql-guard.md", "reason": "Stream A 直接依据：check-raw-sql.mjs 设计、路径受限标记契约、伪代码、4 个单测用例、check 接线"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/rls-prototype.md", "reason": "Stream B 直接依据：rent_app role/policy DDL、text 比较（非 uuid）、超级用户陷阱、set_config 集成点、负例测试设计"}
+{"file": ".trellis/tasks/07-13-pr2-ci-rls-migration/research/orm-rls-choice.md", "reason": "ORM 决策背景：为何继续 TypeORM、guard 不可移植、切换触发条件（避免误改 ORM 栈）"}

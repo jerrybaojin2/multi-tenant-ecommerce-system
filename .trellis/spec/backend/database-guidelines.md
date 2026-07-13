@@ -59,6 +59,8 @@ export interface TenantScopedRow {
 - 在 request-scoped business services 中直接使用 global DB client
 - 对 tenant-owned writes 接受来自 client input 的 `tenantId`
 
+**CI 守护（PR2 落地）**：`scripts/check-raw-sql.mjs` 扫描 `packages/backend/src/**/*.ts`（排除 `migrations/`、`data-source.ts`、`*.subscriber.ts`），检测 `.query(` 调用并接入根 `npm run check`（`guard:raw-sql`）。唯一放行方式：在 `modules/platform/**` 或 `core/database/rls.ts` 下的文件里加 `// raw-sql: platform-only <reason>` 标记（同方法/向上 3 行内）；标记出现在非允许路径会**单独**报错，不能盲目复制到业务代码。该 lint 层与运行期 `requirePlatformContext()` 角色守护、DB 层 RLS 共同构成三层防御。SQL 字符串拼接检测留待 v2。
+
 例外必须同时满足：
 
 - 操作是 platform-only，或确实是 genuinely cross-tenant。
@@ -165,15 +167,23 @@ export class TenantSubscriber {
 
 ## RLS 指南
 
-迁移系统到位后，对 tenant-owned tables 采用 PostgreSQL RLS：
+迁移系统到位后，对 tenant-owned tables 采用 PostgreSQL RLS。PR2 已在 `demo_resources` 上落地单表原型（migration `1783161601000-demo-resources-rls.ts` + `tests/rls-prototype.test.mjs`），后续租户表按同模式逐表铺。
 
-- 使用不是 table owner、不是 superuser、且没有 `BYPASSRLS` 的 app role。
-- 每个 transaction 使用 `set_config('app.tenant_id', tenantId, true)` 设置 tenant context。
+- 使用不是 table owner、不是 superuser、且没有 `BYPASSRLS` 的 app role（原型用 `rent_app`：`NOSUPERUSER NOBYPASSRLS`）。
+- 每个 transaction 使用 `set_config('app.tenant_id', tenantId, true)` 设置 tenant context。TypeORM 经 `queryRunner.query("SELECT set_config('app.tenant_id', $1, true)", [tenantId])` 在事务内下发。
 - 添加 `USING` 和 `WITH CHECK` policies，使 read/write 都默认拒绝越权访问。
-- 适当使用 `FORCE ROW LEVEL SECURITY`。
+- policy 的 tenant 比较必须与列类型一致：本项目所有 tenant-owned 表的 `tenant_id` 是 `varchar(64)`（继承 `BaseTenantEntity`），policy 用 **text 比较** `tenant_id = current_setting('app.tenant_id', true)`，**不要 `::uuid` cast**（否则每个查询报 `invalid input syntax for type uuid`）。
+- 适当使用 `FORCE ROW LEVEL SECURITY`（原型已开启，使非超级用户的 owner 也受限）。
 - Platform maintenance jobs 应使用显式 platform roles 或受控 bypass paths，绝不使用普通 merchant request connections。
 
+**两个关键陷阱（已在原型验证）**：
+
+1. **超级用户绕过 RLS**：app 当前以 `postgres` 超级用户连库（`docker-compose.yml`/`config.default.ts`），超级用户**总是**绕过 RLS，`FORCE ROW LEVEL SECURITY` 也压不住。因此 RLS 测试必须以非超级用户身份执行——原型测试在事务内 `SET LOCAL ROLE rent_app`（postgres 超级用户可 `SET ROLE` 到任意角色，`SET LOCAL` 在 commit 时回退，无跨请求泄漏）。**生产接入 RLS 前，运行期连接必须改用非超级用户 app role**（当前请求生命周期尚未集成 `set_config`，见 §待办）。
+2. **幂等 DDL**：role 用 `DO $$ ... EXCEPTION WHEN duplicate_object`；policy 用 `DROP POLICY IF EXISTS` + `CREATE POLICY`；`GRANT`/`ALTER TABLE ... ENABLE/FORCE` 天然幂等。`down()` 反转 policy/RLS/grants，**不要** `DROP ROLE`（后续表/migration 会复用）。
+
 RLS 不替代应用层 scoping；它是针对漏掉 filters 和未来 raw-query mistakes 的数据库兜底。
+
+> **PR2 边界**：原型只证明 DB 契约（non-owner role + policy + 负例），未做请求生命周期集成（`DemoResourceService` 现用 `@InjectEntityModel` + 裸 `createQueryBuilder()` 无 queryRunner，中间件发的 `set_config` 到不了查询连接）。全链路 `set_config` 集成 + 运行期连接改 app role 是独立后续任务。
 
 ---
 
@@ -192,6 +202,8 @@ RLS 不替代应用层 scoping；它是针对漏掉 filters 和未来 raw-query 
 - 永远不要依赖 ORM auto-sync 变更 production schemas。
 - 优先使用 service-level integrity checks，而不是临时的 foreign-key-free conventions。在它们能保护 money、stock 或 rental availability 时使用 database constraints。
 - 以 tenant context 索引 tenant-scoped high-volume lookup columns，例如 tenant + status、tenant + order no、tenant + created time。
+
+**auto-sync 边界**：`synchronize` 仅允许 local/test（`config.local.ts` 为 `true`），**prod 永不**（`config.prod.ts` 为 `false`，由 `scripts/check-prod-config.mjs` 守护并接入根 `npm run check`）。prod 建表/改表一律走 migration：`npm run migration:run` / `migration:revert`（经 `packages/backend/src/core/database/data-source.ts` 的独立 DataSource）。该 DataSource 必须只导出**单个** DataSource 实例（TypeORM CLI 限制），entities/migrations 用类引用数组（非 glob）。TypeORM 0.3.x 的迁移跟踪表名为 `migrations`（非 `typeorm_migrations`）。
 
 ---
 

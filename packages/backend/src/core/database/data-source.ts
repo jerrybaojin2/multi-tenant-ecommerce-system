@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { DemoResourceEntity } from '../../modules/demo-resource/entity/demo-resource.entity';
 import { InitDemoResources1783161600000 } from './migrations/1783161600000-init-demo-resources';
+import { DemoResourcesRls1783161601000 } from './migrations/1783161601000-demo-resources-rls';
 
 /**
  * 独立 DataSource：供 TypeORM CLI（migration:run / migration:revert）
@@ -25,7 +26,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'rent_dev',
   entities: [DemoResourceEntity],
-  migrations: [InitDemoResources1783161600000],
+  migrations: [InitDemoResources1783161600000, DemoResourcesRls1783161601000],
   synchronize: false,
   logging: process.env.DB_LOG === 'true',
 });
